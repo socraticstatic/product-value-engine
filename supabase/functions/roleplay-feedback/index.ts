@@ -40,7 +40,7 @@ serve(async (req) => {
 
     const { messages, persona } = parseResult.data;
 
-    const LOVABLE_API_KEY = requireApiKey();
+    const GOOGLE_AI_API_KEY = requireApiKey();
 
     const systemPrompt = `You are a sales coaching assistant evaluating a mock role-play conversation between an AT&T sales representative (the human) and a prospective customer persona.
 
@@ -77,15 +77,15 @@ Where to improve:
     ];
 
     const response = await fetch(
-      "https://ai.gateway.lovable.dev/v1/chat/completions",
+      "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions",
       {
         method: "POST",
         headers: {
-          Authorization: `Bearer ${LOVABLE_API_KEY}`,
+          Authorization: `Bearer ${GOOGLE_AI_API_KEY}`,
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          model: "google/gemini-2.5-flash",
+          model: "gemini-2.5-flash",
           messages: chatMessages,
           stream: false,
         }),

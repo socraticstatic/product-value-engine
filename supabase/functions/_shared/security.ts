@@ -56,12 +56,12 @@ export function sanitizeArrayForPrompt(items: string[]): string[] {
 }
 
 /**
- * Get the Lovable API key or throw.
+ * Get the Google AI API key or throw.
  */
 export function requireApiKey(): string {
-  const key = Deno.env.get("LOVABLE_API_KEY");
+  const key = Deno.env.get("GOOGLE_AI_API_KEY");
   if (!key) {
-    throw new Error("LOVABLE_API_KEY is not configured");
+    throw new Error("GOOGLE_AI_API_KEY is not configured");
   }
   return key;
 }

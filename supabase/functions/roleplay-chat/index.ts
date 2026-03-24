@@ -54,7 +54,7 @@ serve(async (req) => {
 
     const { messages, persona, isStart } = parseResult.data;
 
-    const LOVABLE_API_KEY = requireApiKey();
+    const GOOGLE_AI_API_KEY = requireApiKey();
 
     // Build system prompt based on persona
     const topNeedsSection = persona.topNeeds
@@ -133,14 +133,14 @@ Remember: You are ${sanitizeForPrompt(persona.name)}, a customer BEING SOLD TO. 
       chatMessages.push(...messages);
     }
 
-    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+    const response = await fetch("https://generativelanguage.googleapis.com/v1beta/openai/chat/completions", {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${LOVABLE_API_KEY}`,
+        Authorization: `Bearer ${GOOGLE_AI_API_KEY}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "google/gemini-2.5-flash",
+        model: "gemini-2.5-flash",
         messages: chatMessages,
         stream: true,
       }),

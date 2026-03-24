@@ -35,7 +35,7 @@ serve(async (req) => {
     const sanitizedCompetitor = competitor ? sanitizeForPrompt(competitor.trim()) : null;
     const sanitizedProductCategory = productCategory ? sanitizeForPrompt(productCategory.trim()) : null;
 
-    const LOVABLE_API_KEY = requireApiKey();
+    const GOOGLE_AI_API_KEY = requireApiKey();
 
     const systemPrompt = `You are an expert AT&T Business sales consultant helping sellers respond to competitor claims they hear from customers. Your role is to provide nuanced, honest, and practical responses that acknowledge the "not apples-to-apples" nature of competitive comparisons.
 
@@ -92,14 +92,14 @@ Frame these as natural, consultative questions you'd ask a customer sitting acro
 
 Format your response as JSON with these exact keys: claimAnalysis, notApplesToApples (array of strings), attAdvantage, suggestedResponse, questionsToAsk (array of strings)`;
 
-    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+    const response = await fetch("https://generativelanguage.googleapis.com/v1beta/openai/chat/completions", {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${LOVABLE_API_KEY}`,
+        Authorization: `Bearer ${GOOGLE_AI_API_KEY}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "google/gemini-2.5-flash",
+        model: "gemini-2.5-flash",
         messages: [
           { role: "system", content: systemPrompt },
           { role: "user", content: userPrompt }

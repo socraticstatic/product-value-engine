@@ -29,7 +29,7 @@ serve(async (req) => {
 
     const { productId, productName, competitors } = parseResult.data;
 
-    const LOVABLE_API_KEY = requireApiKey();
+    const GOOGLE_AI_API_KEY = requireApiKey();
 
     const systemPrompt = `You are a competitive intelligence analyst for AT&T Business sales teams.
 Your job is to provide accurate, up-to-date information about competitor business internet, voice, and wireless offerings.
@@ -49,14 +49,14 @@ For each competitor, provide:
 
 Be specific about current market pricing and offers.`;
 
-    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+    const response = await fetch("https://generativelanguage.googleapis.com/v1beta/openai/chat/completions", {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${LOVABLE_API_KEY}`,
+        Authorization: `Bearer ${GOOGLE_AI_API_KEY}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "google/gemini-2.5-flash",
+        model: "gemini-2.5-flash",
         messages: [
           { role: "system", content: systemPrompt },
           { role: "user", content: userPrompt }
