@@ -6,7 +6,6 @@ import { CheckCircle2, AlertTriangle, DollarSign, Clock, Sparkles, ChevronDown, 
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
 import { Recommendation } from './types';
-import { formatCurrency } from '@/lib/roi-calculator';
 import { DemoBlur } from '@/components/ui/DemoBlur';
 
 interface ProductRecommendationProps {

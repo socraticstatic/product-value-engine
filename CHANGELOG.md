@@ -4,6 +4,31 @@ All notable changes to the Product Value Engine project will be documented in th
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [0.5.0] - 2026-03-24
+
+### Security
+
+- Wired `requireAuthUser()` into all 7 edge functions -- @att.com domain restriction now enforced server-side (was dead code)
+- Genericized all catch-block error responses -- internal messages no longer leaked to client
+- Edge functions now return "An internal error occurred" instead of error.message
+
+### Changed
+
+- Route-level code splitting with React.lazy (Index, ProductLab, Login) + Suspense fallback
+- Vite build optimization: manualChunks splits vendor, supabase, UI (Radix), and charts into separate chunks
+- Initial JS payload reduced from 2.0 MB single chunk to ~340 KB largest chunk (vendor+UI on first load)
+- Build target set to es2020
+
+### Fixed
+
+- Resolved all 107 ESLint errors across 30+ files (zero errors, zero warnings)
+- Removed unused imports, variables, and functions from 30 components
+- Fixed React anti-pattern: CompareView component created during render (SolutionsCatalogPage)
+- Fixed setState-in-effect in SolutionsCatalogPage (replaced with useMemo)
+- Fixed missing useEffect dependency in RolePlayChat (wrapped startConversation in useCallback)
+- Replaced 3 `any` types with proper TypeScript types
+- Removed unused `date-fns`-style patterns and dead code across utilities
+
 ## [0.4.0] - 2026-03-24
 
 ### Changed

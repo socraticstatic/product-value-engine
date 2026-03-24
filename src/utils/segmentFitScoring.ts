@@ -1,6 +1,6 @@
-import { CustomerPersona, customerPersonas, groupingMetadata, GroupingKey } from '@/data/personas';
+import { groupingMetadata, GroupingKey } from '@/data/personas';
 import { products, Product } from '@/data/products';
-import { calculateBundleFits, calculateAllPersonaFits, PersonaFitScore, getFitLevel, FitLevel } from './personaFitScoring';
+import { calculateBundleFits, calculateAllPersonaFits, PersonaFitScore } from './personaFitScoring';
 import { competitiveDifferentiation, ProductDifferentiator } from '@/data/competitiveDifferentiation';
 
 export interface FitBreakdown {

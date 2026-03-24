@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useMemo } from 'react';
 import { products } from '@/data/products';
 import { calculateBundle, generateBundleValueStatement, getSuggestedBundles } from '@/utils/bundleCalculations';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';

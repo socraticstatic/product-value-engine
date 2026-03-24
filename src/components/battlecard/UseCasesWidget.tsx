@@ -12,7 +12,7 @@ interface UseCasesWidgetProps {
   customerIndustry?: string;
 }
 
-function UseCaseCard({ useCase, pillarName }: { useCase: CustomerUseCase; pillarName: string }) {
+function UseCaseCard({ useCase }: { useCase: CustomerUseCase }) {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
@@ -97,7 +97,7 @@ function PillarSection({ pillar }: { pillar: MessagingPillar }) {
 
       <div className="space-y-3">
         {pillar.useCases.map(useCase => (
-          <UseCaseCard key={useCase.id} useCase={useCase} pillarName={pillar.name} />
+          <UseCaseCard key={useCase.id} useCase={useCase} />
         ))}
       </div>
     </div>

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Product } from '@/data/products';
-import { CustomerProfile, painPointOptions, priorityOptions, industryOptions } from '@/types/customer';
+import { CustomerProfile, painPointOptions, industryOptions } from '@/types/customer';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -9,7 +9,6 @@ import {
   User, Building2, Users, MapPin, Wallet, AlertTriangle, Target, 
   CheckCircle2, ArrowRight, Zap, TrendingUp, PenLine, ChevronDown, ChevronUp
 } from 'lucide-react';
-import { useDemoMode } from '@/contexts/DemoModeContext';
 import { DemoBlur } from '@/components/ui/DemoBlur';
 
 import {
@@ -40,8 +39,6 @@ const painPointIcons: Record<string, string> = {
 
 export function CustomerProfileWidget({ products, customerProfile }: CustomerProfileWidgetProps) {
   const [isExpanded, setIsExpanded] = useState(true);
-  const { isDemoMode } = useDemoMode();
-
   const getCustomerTypeLabel = () => {
     switch (customerProfile.type) {
       case 'small-business': return 'Small Business';

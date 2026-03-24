@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -41,18 +41,7 @@ export function RolePlayChat({ persona, onClose }: RolePlayChatProps) {
 
   const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/roleplay-chat`;
 
-  useEffect(() => {
-    // Start conversation with persona greeting
-    startConversation();
-  }, []);
-
-  useEffect(() => {
-    if (scrollRef.current) {
-      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
-    }
-  }, [messages]);
-
-  const startConversation = async () => {
+  const startConversation = useCallback(async () => {
     setIsLoading(true);
     let assistantContent = '';
 
@@ -127,7 +116,18 @@ export function RolePlayChat({ persona, onClose }: RolePlayChatProps) {
       setIsLoading(false);
       inputRef.current?.focus();
     }
-  };
+  }, [CHAT_URL, persona, toast]);
+
+  useEffect(() => {
+    // Start conversation with persona greeting
+    startConversation();
+  }, [startConversation]);
+
+  useEffect(() => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+    }
+  }, [messages]);
 
   const sendMessage = async () => {
     if (!input.trim() || isLoading) return;
@@ -236,7 +236,7 @@ export function RolePlayChat({ persona, onClose }: RolePlayChatProps) {
         throw error;
       }
 
-      const feedbackText = (data as any)?.feedback;
+      const feedbackText = (data as Record<string, unknown>)?.feedback;
       if (typeof feedbackText !== 'string' || !feedbackText.trim()) {
         throw new Error('Unexpected feedback format from server');
       }

@@ -9,14 +9,13 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Progress } from '@/components/ui/progress';
 import { Building2, Users, MapPin, AlertCircle, Target, ArrowRight, ArrowLeft, CheckCircle2, Sparkles } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { 
-  BusinessProfile, 
-  INDUSTRIES, 
-  BUSINESS_SIZES, 
-  LOCATIONS, 
-  PAIN_POINTS, 
+import {
+  BusinessProfile,
+  INDUSTRIES,
+  BUSINESS_SIZES,
+  LOCATIONS,
+  PAIN_POINTS,
   PRIORITIES,
-  MARKET_TYPES,
   getMarketTypeFromSize
 } from './types';
 

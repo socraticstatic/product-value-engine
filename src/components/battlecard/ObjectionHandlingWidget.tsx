@@ -4,7 +4,6 @@ import { CustomerProfile } from '@/types/customer';
 import { BattlecardWidget } from './BattlecardWidget';
 import { ShieldAlert, ChevronDown, ChevronUp, MessageCircleQuestion } from 'lucide-react';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
-import { useDemoMode } from '@/contexts/DemoModeContext';
 import { DemoBlur } from '@/components/ui/DemoBlur';
 
 interface ObjectionHandlingWidgetProps {
@@ -12,11 +11,9 @@ interface ObjectionHandlingWidgetProps {
   customerProfile: CustomerProfile;
 }
 
-export function ObjectionHandlingWidget({ products, customerProfile }: ObjectionHandlingWidgetProps) {
+export function ObjectionHandlingWidget({ products }: ObjectionHandlingWidgetProps) {
   const [isOpen, setIsOpen] = useState(true);
   const [expandedIdx, setExpandedIdx] = useState<number | null>(0);
-  const { isDemoMode } = useDemoMode();
-
   // Collect all objection handling tips
   const allObjections = products.flatMap(p => 
     p.objectionHandling.map(o => ({ ...o, productName: p.name }))

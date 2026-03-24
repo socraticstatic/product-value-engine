@@ -1,11 +1,10 @@
 import { useMemo } from 'react';
 import { EnhancedSegmentFit } from '@/utils/segmentFitScoring';
-import { 
-  aggregateSegmentCharacteristics, 
+import {
+  aggregateSegmentCharacteristics,
   getBusinessProfileSummary,
   getPrimaryDecisionStyle,
-  industryIcons,
-  SegmentCharacteristics 
+  industryIcons
 } from '@/utils/segmentAggregation';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';

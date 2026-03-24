@@ -5,8 +5,6 @@ import {
   getProductDifferentiators,
   generalDifferentiators,
   ProductDifferentiator,
-  CompetitorComparison,
-  competitiveDifferentiation,
 } from "@/data/competitiveDifferentiation";
 import { BattlecardWidget } from "./BattlecardWidget";
 import { Badge } from "@/components/ui/badge";
@@ -22,10 +20,8 @@ import {
 import {
   Swords,
   Shield,
-  ShieldCheck,
   AlertTriangle,
   CheckCircle2,
-  ArrowRight,
   DollarSign,
   Zap,
   ChevronRight,
@@ -38,7 +34,6 @@ import {
   TrendingDown,
   Minus,
   Filter,
-  Scale,
 } from "lucide-react";
 import { toast } from "sonner";
 import {
@@ -48,7 +43,6 @@ import {
   LiveCompetitorData,
   CompetitorIntelResult,
 } from "@/services/competitorIntel";
-import { useDemoMode } from '@/contexts/DemoModeContext';
 import { DemoBlur } from '@/components/ui/DemoBlur';
 
 interface CompetitiveDifferentiationWidgetProps {
@@ -75,8 +69,6 @@ export function CompetitiveDifferentiationWidget({
   const [selectedCompetitors, setSelectedCompetitors] = useState<string[]>(
     COMPETITORS.map(c => c.name)
   );
-  const { isDemoMode } = useDemoMode();
-
   const productDifferentiators = products
     .map((p) => ({
       product: p,
@@ -350,25 +342,20 @@ export function CompetitiveDifferentiationWidget({
   );
 }
 
-function ProductDifferentiatorContent({
-  differentiators,
-  customerProfile,
-  liveData,
-  marketTrends,
-  selectedCompetitors,
-}: {
+function ProductDifferentiatorContent(props: {
   differentiators: ProductDifferentiator;
   customerProfile: CustomerProfile;
   liveData?: LiveCompetitorData[];
   marketTrends?: string[];
   selectedCompetitors: string[];
 }) {
+  const { differentiators, liveData, marketTrends, selectedCompetitors } = props;
   const [activeTab, setActiveTab] = useState<
     "comparisons" | "nuances" | "hidden" | "trends"
   >("comparisons");
 
   // Merge static data with live data if available
-  const allComparisons: LiveCompetitorData[] = liveData 
+  const allComparisons: LiveCompetitorData[] = liveData
     ? mergeWithStaticData(differentiators.competitorComparisons, liveData)
     : differentiators.competitorComparisons.map(c => ({ ...c, isLive: false }));
 

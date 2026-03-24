@@ -1,40 +1,26 @@
 import { useState } from 'react';
-import { Product, getValuePropositionSummary } from '@/data/products';
+import { Product } from '@/data/products';
 import { BattlecardWidget } from './BattlecardWidget';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
-import { Zap, Briefcase, CheckCircle2, Heart, Star, Target, ArrowRight, Lightbulb, ChevronDown, ChevronUp, MessageCircle } from 'lucide-react';
-import { CustomerProfile, painPointOptions, priorityOptions } from '@/types/customer';
-import { getProductDifferentiators } from '@/data/competitiveDifferentiation';
+import { Zap, Briefcase, CheckCircle2, Heart, Star, Target, ArrowRight, ChevronDown, ChevronUp, MessageCircle } from 'lucide-react';
+import { CustomerProfile, painPointOptions } from '@/types/customer';
 import { getNeedTagColor } from '@/utils/needTagsSystem';
-import { 
+import {
   getNuancedSolution,
   getNuancedPriority,
   getEmpatheticOpener,
   mapFeaturesToBusinessImpacts,
-  getSituationAcknowledgment,
   getFullValueProposition,
-  getContextSpecificBenefit,
-  getContextSpecificBenefits
+  getContextSpecificBenefit
 } from '@/utils/businessImpactLanguage';
 import { businessGradeCore } from '@/data/businessGradePillars';
-import { useDemoMode } from '@/contexts/DemoModeContext';
 import { DemoBlur } from '@/components/ui/DemoBlur';
 
 interface ValuePropsWidgetProps {
   products: Product[];
   customerProfile: CustomerProfile;
-}
-
-// Get customer type label - more conversational
-function getCustomerTypeLabel(type: string): string {
-  const labels: Record<string, string> = {
-    'small-business': 'Small Business',
-    'mid-market': 'Growing Business',
-    'enterprise': 'Enterprise'
-  };
-  return labels[type] || type;
 }
 
 // Get location context - more natural
@@ -138,7 +124,6 @@ function matchProductToNeeds(product: Product, profile: CustomerProfile): Array<
 
 export function ValuePropsWidget({ products, customerProfile }: ValuePropsWidgetProps) {
   const [isExpanded, setIsExpanded] = useState(true);
-  const { isDemoMode } = useDemoMode();
   const primaryProduct = products[0];
   const competitiveAdvantages = [...new Set(products.flatMap(p => p.competitiveAdvantages))];
   const businessDifferentiators = [...new Set(products.flatMap(p => p.businessDifferentiators || []))];
@@ -158,11 +143,6 @@ export function ValuePropsWidget({ products, customerProfile }: ValuePropsWidget
     ? getEmpatheticOpener(primaryPainPoint, customerProfile)
     : null;
   
-  // Get situation acknowledgment for additional context
-  const situationContext = primaryPainPoint 
-    ? getSituationAcknowledgment(primaryPainPoint, customerProfile)
-    : null;
-
   // Get pain point labels
   const getPainPointLabel = (painPoint: string) => 
     painPointOptions.find(p => p.id === painPoint)?.label || painPoint;

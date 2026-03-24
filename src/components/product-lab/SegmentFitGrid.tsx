@@ -1,8 +1,7 @@
 import { useMemo } from 'react';
-import { 
-  calculateAllDimensionFits, 
-  DimensionFitResult,
-  EnhancedSegmentFit 
+import {
+  calculateAllDimensionFits,
+  EnhancedSegmentFit
 } from '@/utils/segmentFitScoring';
 import { PersonaFitScore } from '@/utils/personaFitScoring';
 import { 
@@ -13,7 +12,8 @@ import {
 } from '@/utils/segmentAggregation';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
+
+
 import { HoverCard, HoverCardTrigger, HoverCardContent } from '@/components/ui/hover-card';
 import { 
   TrendingUp,
@@ -26,9 +26,9 @@ import {
 } from 'lucide-react';
 import { Collapsible, CollapsibleTrigger, CollapsibleContent } from '@/components/ui/collapsible';
 import { cn } from '@/lib/utils';
-import { useDemoMode } from '@/contexts/DemoModeContext';
 import { DemoBlur } from '@/components/ui/DemoBlur';
-import { SegmentSummaryCard } from './segment-fit/SegmentSummaryCard';
+
+
 
 // Helper component for score breakdown bars
 function ScoreBar({ label, score, weight }: { label: string; score: number; weight: string }) {
@@ -195,9 +195,7 @@ interface SegmentFitGridProps {
 }
 
 export function SegmentFitGrid({ productIds }: SegmentFitGridProps) {
-  const { isDemoMode } = useDemoMode();
-
-  const { topSegment, segmentLabel, dimensionLabel, otherStrongSegments, characteristics, primarySegmentId } = useMemo(() => {
+  const { topSegment, segmentLabel, characteristics, primarySegmentId } = useMemo(() => {
     if (productIds.length === 0) {
       return { 
         topSegment: null, 
@@ -276,10 +274,7 @@ export function SegmentFitGrid({ productIds }: SegmentFitGridProps) {
     );
   }
 
-  if (isDemoMode) {
-    // Still render the card structure but let individual text elements blur
-    // Don't return early - let the real UI render
-  }
+
 
   if (!topSegment || !characteristics) {
     return (

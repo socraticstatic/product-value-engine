@@ -1,3 +1,4 @@
+import { lazy, Suspense } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -6,10 +7,12 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { DemoModeProvider } from "./contexts/DemoModeContext";
 import { AuthProvider } from "./contexts/AuthContext";
 import { ProtectedRoute } from "./components/ProtectedRoute";
-import Index from "./pages/Index";
-import ProductLab from "./pages/ProductLab";
-import Login from "./pages/Login";
+import { Loader2 } from "lucide-react";
 import NotFound from "./pages/NotFound";
+
+const Index = lazy(() => import("./pages/Index"));
+const ProductLab = lazy(() => import("./pages/ProductLab"));
+const Login = lazy(() => import("./pages/Login"));
 
 const queryClient = new QueryClient();
 
@@ -21,12 +24,14 @@ const App = () => (
           <Toaster />
           <Sonner />
           <BrowserRouter basename="/product-value-engine">
-            <Routes>
-              <Route path="/login" element={<Login />} />
-              <Route path="/" element={<ProtectedRoute><Index /></ProtectedRoute>} />
-              <Route path="/product-lab" element={<ProtectedRoute><ProductLab /></ProtectedRoute>} />
-              <Route path="*" element={<NotFound />} />
-            </Routes>
+            <Suspense fallback={<div className="flex items-center justify-center min-h-screen"><Loader2 className="h-8 w-8 animate-spin text-muted-foreground" /></div>}>
+              <Routes>
+                <Route path="/login" element={<Login />} />
+                <Route path="/" element={<ProtectedRoute><Index /></ProtectedRoute>} />
+                <Route path="/product-lab" element={<ProtectedRoute><ProductLab /></ProtectedRoute>} />
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </Suspense>
           </BrowserRouter>
         </TooltipProvider>
       </DemoModeProvider>

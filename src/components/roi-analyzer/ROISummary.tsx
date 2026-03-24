@@ -1,7 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { TrendingUp, DollarSign, Clock, Shield, Sparkles } from 'lucide-react';
-import { ROISummary as ROISummaryType, formatCurrency, formatCurrencyFull } from '@/lib/roi-calculator';
+import { DollarSign, Clock, Shield, Sparkles } from 'lucide-react';
+import { ROISummary as ROISummaryType, formatCurrency } from '@/lib/roi-calculator';
 
 interface ROISummaryProps {
   summary: ROISummaryType;

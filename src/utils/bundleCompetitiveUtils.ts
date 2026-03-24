@@ -1,8 +1,7 @@
 import { products } from '@/data/products';
-import { 
-  competitiveDifferentiation, 
-  generalDifferentiators, 
-  getProductDifferentiators 
+import {
+  generalDifferentiators,
+  getProductDifferentiators
 } from '@/data/competitiveDifferentiation';
 
 export interface BundleVulnerability {

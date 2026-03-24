@@ -1,6 +1,6 @@
 // ROI calculation formulas and product cost models
 // Adjusted for realistic ROI projections (50-350% range)
-import { getScaledBenchmarks, getBenchmarkByIndustry, businessSizeMultipliers, locationMultipliers } from './benchmarks';
+import { getScaledBenchmarks, businessSizeMultipliers, locationMultipliers } from './benchmarks';
 
 export interface ROIComponent {
   category: string;
@@ -189,7 +189,6 @@ export function calculateProductROI(
   painPoints: string[]
 ): ProductROI {
   const productCost = getProductCost(productId);
-  const benchmark = getBenchmarkByIndustry(industryKey);
   const sizeMultiplier = businessSizeMultipliers[businessSize] || businessSizeMultipliers['51-200'];
   const locationMultiplier = locationMultipliers[locations] || locationMultipliers['1'];
   

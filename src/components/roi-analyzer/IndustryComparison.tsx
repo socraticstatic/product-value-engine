@@ -1,7 +1,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { BarChart3, TrendingUp, TrendingDown, Minus } from 'lucide-react';
-import { getBenchmarkByIndustry, businessSizeMultipliers, IndustryBenchmark } from '@/lib/benchmarks';
+import { getBenchmarkByIndustry, businessSizeMultipliers } from '@/lib/benchmarks';
 import { formatCurrency } from '@/lib/roi-calculator';
 
 interface IndustryComparisonProps {

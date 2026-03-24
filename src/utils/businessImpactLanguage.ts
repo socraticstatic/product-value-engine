@@ -438,21 +438,6 @@ const locationModifiers: Record<string, string> = {
   '20+': 'across your entire footprint'
 };
 
-// Budget-sensitive language
-const budgetLanguage: Record<string, { focus: string; benefit: string }> = {
-  'cost-conscious': { 
-    focus: 'without breaking the budget', 
-    benefit: 'maximizing every dollar you invest' 
-  },
-  'balanced': { 
-    focus: 'with the right value-to-performance ratio', 
-    benefit: 'balancing cost with capability' 
-  },
-  'performance-focused': { 
-    focus: 'with business-grade capability', 
-    benefit: 'getting the best performance available' 
-  }
-};
 export const businessImpacts: Record<string, Record<string, string>> = {
   'slow-speeds': {
     'retail': "Customers walking out when checkout is slow",
@@ -911,8 +896,7 @@ export const contextSpecificBenefits: Record<string, Record<string, Record<strin
 // Get a context-specific benefit statement
 export function getContextSpecificBenefit(
   category: 'speed-performance' | 'reliability-uptime',
-  profile: CustomerProfile,
-  useCase?: string
+  profile: CustomerProfile
 ): string {
   const normalizedIndustry = normalizeIndustryKey(profile.industry);
   const size = profile.type;
@@ -1035,31 +1019,24 @@ export function mapFeaturesToBusinessImpacts(features: string[], industry: strin
   
   for (const feature of features) {
     const lower = feature.toLowerCase();
-    let matched = false;
-    
+
     if (lower.includes('uptime') || lower.includes('99.9') || lower.includes('sla') || lower.includes('reliable')) {
       results.push(getFeatureImpact('uptime', industry));
-      matched = true;
     }
     if (lower.includes('speed') || lower.includes('fiber') || lower.includes('bandwidth') || lower.includes('gbps') || lower.includes('fast')) {
       results.push(getFeatureImpact('speed', industry));
-      matched = true;
     }
     if (lower.includes('security') || lower.includes('encrypt') || lower.includes('protect') || lower.includes('firewall')) {
       results.push(getFeatureImpact('security', industry));
-      matched = true;
     }
     if (lower.includes('backup') || lower.includes('failover') || lower.includes('redundant')) {
       results.push(getFeatureImpact('backup', industry));
-      matched = true;
     }
     if (lower.includes('support') || lower.includes('24/7') || lower.includes('dedicated')) {
       results.push(getFeatureImpact('support', industry));
-      matched = true;
     }
     if (lower.includes('scale') || lower.includes('grow') || lower.includes('expand') || lower.includes('flexible')) {
       results.push(getFeatureImpact('scalability', industry));
-      matched = true;
     }
   }
   
@@ -1247,9 +1224,8 @@ export function getBusinessImpact(painPoint: string, industry: string): string {
 export function getNuancedBusinessImpact(painPoint: string, profile: CustomerProfile): string {
   const normalizedIndustry = normalizeIndustryKey(profile.industry);
   const baseImpact = getBusinessImpact(painPoint, normalizedIndustry);
-  const sizeInfo = sizeModifiers[profile.type] || sizeModifiers['small-business'];
   const locationContext = locationModifiers[profile.locations] || '';
-  
+
   // Add size/location context to certain pain points
   if (painPoint === 'downtime') {
     if (profile.locations !== '1') {
@@ -1259,7 +1235,6 @@ export function getNuancedBusinessImpact(painPoint: string, profile: CustomerPro
   }
   
   if (painPoint === 'high-costs') {
-    const budgetInfo = budgetLanguage[profile.budget];
     if (profile.type === 'small-business') {
       return `${baseImpact} — and for a small business, that money should be growing your business`;
     }
@@ -1284,7 +1259,6 @@ export function getCustomerCentricSolution(painPoint: string, industry: string):
 export function getNuancedSolution(painPoint: string, profile: CustomerProfile): string {
   const normalizedIndustry = normalizeIndustryKey(profile.industry);
   const baseSolution = getCustomerCentricSolution(painPoint, normalizedIndustry);
-  const budgetInfo = budgetLanguage[profile.budget];
   const employeeContext = employeeImpacts[profile.employeeCount] || 'your team';
   const locationContext = locationModifiers[profile.locations] || '';
   
@@ -1589,7 +1563,6 @@ export function getConversationalValueStatement(
   product: { name: string; valuePropositionStatement: { keyBenefit: string } },
   profile: CustomerProfile
 ): string {
-  const industryLabel = profile.industry.replace(/-/g, ' ');
   const primaryPain = profile.painPoints[0];
   const primaryPriority = profile.priorities[0];
   
@@ -2044,9 +2017,8 @@ export function getFullValueProposition(
   profile: CustomerProfile
 ): string {
   const primaryPain = profile.painPoints[0];
-  const secondaryPain = profile.painPoints[1];
   const primaryPriority = profile.priorities[0];
-  
+
   // Normalize industry key for lookups (handles variations like "Retail / E-Commerce" -> "retail")
   const normalizedIndustry = normalizeIndustryKey(profile.industry);
   const industryLabel = profile.industry.replace(/[-/]/g, ' ').replace(/\s+/g, ' ').trim();
@@ -3140,7 +3112,7 @@ export function generateStructuredValueProp(
   const keyDifferentiator = productDifferentiator || industryDifferentiators[normalizedIndustry] || industryDifferentiators['default'];
   
   // Generate the overall statement using the existing function
-  const overallStatement = generateCustomerCentricValueProp(profile, product as any);
+  const overallStatement = generateCustomerCentricValueProp(profile, product as { name: string; valuePropositionStatement: { keyBenefit: string; differentiation: string } });
   
   // Generate a concise bottom-line summary
   const bottomLineTemplates: Record<string, string> = {

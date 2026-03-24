@@ -7,7 +7,7 @@ interface FitBreakdownDisplayProps {
 }
 
 export function FitBreakdownDisplay({ fitBreakdown, compact = false }: FitBreakdownDisplayProps) {
-  const { strong, moderate, weak, total, summary } = fitBreakdown;
+  const { strong, moderate, weak, summary } = fitBreakdown;
 
   // Generate visual dots
   const dots = [];

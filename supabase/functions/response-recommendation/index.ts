@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { z } from "https://deno.land/x/zod@v3.22.4/mod.ts";
 import { getCorsHeaders, handleCors, sanitizeForPrompt, requireApiKey, handleAiGatewayError, errorResponse } from "../_shared/security.ts";
+import { requireAuthUser } from "../_shared/auth.ts";
 
 // Input validation schema
 const recommendationRequestSchema = z.object({
@@ -18,6 +19,10 @@ serve(async (req) => {
 
   try {
     const corsHeaders = getCorsHeaders(req);
+
+    // Verify authenticated @att.com user
+    const authResult = await requireAuthUser(req, corsHeaders);
+    if (authResult.error) return authResult.error;
 
     // Parse and validate input
     const rawBody = await req.json();
@@ -118,9 +123,8 @@ Based on the customer's responses, provide a tailored recommendation for how to 
   } catch (error) {
     console.error('Error generating recommendation:', error);
     const corsHeaders = getCorsHeaders(req);
-    const errorMessage = error instanceof Error ? error.message : 'Failed to generate recommendation';
     return new Response(
-      JSON.stringify({ error: errorMessage }),
+      JSON.stringify({ error: "An internal error occurred. Please try again." }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   }

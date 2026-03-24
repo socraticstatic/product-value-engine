@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { z } from "https://deno.land/x/zod@v3.22.4/mod.ts";
 import { getCorsHeaders, handleCors, sanitizeForPrompt, sanitizeArrayForPrompt, requireApiKey, handleAiGatewayError, errorResponse } from "../_shared/security.ts";
+import { requireAuthUser } from "../_shared/auth.ts";
 
 // Input validation schemas
 const messageSchema = z.object({
@@ -40,6 +41,10 @@ serve(async (req) => {
 
   try {
     const corsHeaders = getCorsHeaders(req);
+
+    // Verify authenticated @att.com user
+    const authResult = await requireAuthUser(req, corsHeaders);
+    if (authResult.error) return authResult.error;
 
     // Parse and validate input
     const rawBody = await req.json();
@@ -163,7 +168,7 @@ Remember: You are ${sanitizeForPrompt(persona.name)}, a customer BEING SOLD TO. 
     });
   } catch (error) {
     console.error("Roleplay chat error:", error);
-    return new Response(JSON.stringify({ error: error instanceof Error ? error.message : "Unknown error" }), {
+    return new Response(JSON.stringify({ error: "An internal error occurred. Please try again." }), {
       status: 500,
       headers: { ...getCorsHeaders(req), "Content-Type": "application/json" },
     });

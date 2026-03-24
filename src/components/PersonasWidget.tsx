@@ -115,11 +115,6 @@ export function PersonasWidget() {
     return metadata.options[value]?.label || value;
   };
 
-  const getGroupDescription = (groupKey: GroupingKey, value: string) => {
-    const metadata = groupingMetadata[groupKey] as { options: Record<string, { description: string }> };
-    return metadata.options[value]?.description || '';
-  };
-
   const getSalesTip = (groupKey: GroupingKey, value: string) => {
     const metadata = groupingMetadata[groupKey] as { salesTips: Record<string, string> };
     return metadata.salesTips[value] || '';

@@ -1,4 +1,3 @@
-import { CustomerPersona } from '@/data/personas';
 import { PersonaFitScore, getFitLevel } from '@/utils/personaFitScoring';
 import { cn } from '@/lib/utils';
 import { Check, AlertCircle } from 'lucide-react';

@@ -7,18 +7,15 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Checkbox } from '@/components/ui/checkbox';
-import { 
-  ArrowLeft, 
-  Building2, 
-  Users, 
-  MapPin, 
-  DollarSign, 
-  FileText, 
-  Sparkles,
+import {
+  ArrowLeft,
+  Building2,
+  Users,
+  MapPin,
+  DollarSign,
   GitCompare,
   X,
   Grid3X3,
-  LayoutList
 } from 'lucide-react';
 
 type ViewMode = 'grid' | 'compare' | 'single';
@@ -76,9 +73,9 @@ export function BattlecardDashboard() {
 
   // Single battlecard view
   if (viewMode === 'single' && selectedBattlecard) {
-    const products = selectedBattlecard.recommendedProductIds
+    const matchedProducts = selectedBattlecard.recommendedProductIds
       .map(id => getProductById(id))
-      .filter(Boolean) as any[];
+      .filter((p): p is NonNullable<typeof p> => Boolean(p));
 
     return (
       <div className="space-y-4">
@@ -96,7 +93,7 @@ export function BattlecardDashboard() {
           </div>
         </div>
         <Battlecard
-          products={products}
+          products={matchedProducts}
           customerProfile={selectedBattlecard.customerProfile}
           onReset={handleBack}
         />
@@ -126,10 +123,6 @@ export function BattlecardDashboard() {
         <ScrollArea className="h-[calc(100vh-220px)]">
           <div className={`grid gap-6 ${selectedCards.length === 2 ? 'grid-cols-1 lg:grid-cols-2' : 'grid-cols-1 lg:grid-cols-3'}`}>
             {selectedCards.map(battlecard => {
-              const products = battlecard.recommendedProductIds
-                .map(id => getProductById(id))
-                .filter(Boolean) as any[];
-
               return (
                 <div key={battlecard.persona.id} className="space-y-4">
                   <Card className="border-2 border-primary/20">

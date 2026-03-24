@@ -1,5 +1,4 @@
 import { PersonaFitScore } from './personaFitScoring';
-import { CustomerPersona } from '@/data/personas';
 
 export interface IndustryDistribution {
   name: string;

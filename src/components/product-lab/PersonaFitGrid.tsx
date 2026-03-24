@@ -3,10 +3,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { CheckCircle2, AlertCircle, XCircle, ChevronRight, Users } from 'lucide-react';
-import { useDemoMode } from '@/contexts/DemoModeContext';
+import { CheckCircle2, AlertCircle, XCircle, ChevronRight } from 'lucide-react';
 import { DemoBlur } from '@/components/ui/DemoBlur';
-import { cn } from '@/lib/utils';
 
 interface PersonaFitGridProps {
   fitScores: PersonaFitScore[];
@@ -35,8 +33,6 @@ const fitLevelConfig = {
 };
 
 export function PersonaFitGrid({ fitScores, onPersonaSelect }: PersonaFitGridProps) {
-  const { isDemoMode } = useDemoMode();
-  
   // Sort by score descending
   const sortedScores = [...fitScores].sort((a, b) => b.overallScore - a.overallScore);
 

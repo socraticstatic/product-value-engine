@@ -10,7 +10,6 @@ import { generateCustomerCentricValueProp } from '@/utils/businessImpactLanguage
 import { recommendProductsForCustomer, ProductRecommendation } from '@/utils/productRecommendation';
 import { CustomerProfile } from '@/types/customer';
 import { toast } from 'sonner';
-import { useDemoMode } from '@/contexts/DemoModeContext';
 import { DemoBlur } from '@/components/ui/DemoBlur';
 import { Product } from '@/data/products';
 import { ValuePropModeSelector, SolutionValuePropForm, SolutionValuePropGrid } from './value-prop';
@@ -98,8 +97,6 @@ export const ValuePropGenerator = ({ onCreateBattlecard }: ValuePropGeneratorPro
   // Solution mode state
   const [selectedProducts, setSelectedProducts] = useState<Product[]>([]);
   
-  const { isDemoMode } = useDemoMode();
-
   const handleModeSelect = (mode: 'customer' | 'solution') => {
     if (mode === 'customer') {
       setViewState('customer-form');

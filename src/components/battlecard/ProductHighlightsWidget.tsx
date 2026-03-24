@@ -9,8 +9,7 @@ import type { LucideIcon } from 'lucide-react';
 import { getNeedTagColor, getPriorityLabel, getPainPointLabel, mapProductToNeeds } from '@/utils/needTagsSystem';
 import { mapFeaturesToBusinessImpacts } from '@/utils/businessImpactLanguage';
 import { businessGradePillars } from '@/data/businessGradePillars';
-import { is5GAdvancedRelevant, fiveGConcepts, fiveGCustomerBenefits } from '@/data/fiveGEducation';
-import { useDemoMode } from '@/contexts/DemoModeContext';
+import { is5GAdvancedRelevant, fiveGCustomerBenefits } from '@/data/fiveGEducation';
 import { DemoBlur } from '@/components/ui/DemoBlur';
 
 interface ProductHighlightsWidgetProps {
@@ -37,8 +36,6 @@ export function ProductHighlightsWidget({ products, customerProfile, onViewSolut
   const [expandedProducts, setExpandedProducts] = useState<Set<string>>(new Set());
   const totalMonthly = products.reduce((sum, p) => sum + p.monthlyPrice, 0);
   const hasCustomPricing = products.some(p => p.monthlyPrice === 0);
-  const { isDemoMode } = useDemoMode();
-
   const toggleProduct = (productId: string) => {
     setExpandedProducts(prev => {
       const next = new Set(prev);

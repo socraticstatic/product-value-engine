@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { getCorsHeaders, handleCors, sanitizeForPrompt, sanitizeArrayForPrompt, requireApiKey, handleAiGatewayError, errorResponse } from "../_shared/security.ts";
+import { requireAuthUser } from "../_shared/auth.ts";
 
 interface BusinessProfile {
   companyName: string;
@@ -32,6 +33,11 @@ serve(async (req) => {
 
   try {
     const corsHeaders = getCorsHeaders(req);
+
+    // Verify authenticated @att.com user
+    const authResult = await requireAuthUser(req, corsHeaders);
+    if (authResult.error) return authResult.error;
+
     const GOOGLE_AI_API_KEY = requireApiKey();
 
     const { profile } = await req.json() as { profile: BusinessProfile };
@@ -175,10 +181,9 @@ ${profile.additionalContext ? `Additional Notes: ${sanitizeForPrompt(profile.add
   } catch (error) {
     console.error("Error in analyze-business:", error);
     const corsHeaders = getCorsHeaders(req);
-    const errorMessage = error instanceof Error ? error.message : "Unknown error occurred";
 
     return new Response(
-      JSON.stringify({ error: errorMessage }),
+      JSON.stringify({ error: "An internal error occurred. Please try again." }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   }

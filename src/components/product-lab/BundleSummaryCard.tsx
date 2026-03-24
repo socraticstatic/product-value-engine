@@ -3,7 +3,6 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { DollarSign, Package, Zap, Target, CheckCircle2 } from 'lucide-react';
-import { useDemoMode } from '@/contexts/DemoModeContext';
 import { DemoBlur } from '@/components/ui/DemoBlur';
 
 interface BundleSummaryCardProps {
@@ -18,8 +17,6 @@ const segmentLabels: Record<string, string> = {
 };
 
 export function BundleSummaryCard({ bundle, valueStatement }: BundleSummaryCardProps) {
-  const { isDemoMode } = useDemoMode();
-
   if (bundle.products.length === 0) {
     return (
       <Card className="border-dashed">

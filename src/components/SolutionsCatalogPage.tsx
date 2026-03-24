@@ -1,14 +1,12 @@
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo } from 'react';
 import { products, Product } from '@/data/products';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { 
-  Package, Wifi, Phone, Smartphone, Radio, Shield, 
-  Check, X, DollarSign, Building2, ChevronDown, ChevronUp,
+import {
+  Package, Wifi, Phone, Radio, Shield,
+  Check, X, ChevronDown, ChevronUp,
   Scale, Sparkles, Zap
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
@@ -29,6 +27,155 @@ const segmentLabels: Record<string, string> = {
   'enterprise': 'Enterprise'
 };
 
+function CompareView({ compareProducts }: { compareProducts: Product[] }) {
+  if (compareProducts.length < 2) {
+    return (
+      <div className="text-center py-12">
+        <Scale className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+        <h3 className="text-lg font-semibold text-foreground mb-2">Select Products to Compare</h3>
+        <p className="text-sm text-muted-foreground">
+          Choose 2-4 products from the catalog to see a side-by-side comparison.
+        </p>
+      </div>
+    );
+  }
+
+  // Collect all unique features for comparison
+  const allFeatures = [...new Set(compareProducts.flatMap(p => p.features))];
+
+  return (
+    <div className="overflow-x-auto">
+      <table className="w-full border-collapse">
+        <thead>
+          <tr>
+            <th className="text-left p-3 bg-muted text-sm font-semibold text-foreground sticky left-0 min-w-[150px]">
+              Feature
+            </th>
+            {compareProducts.map(product => (
+              <th key={product.id} className="p-3 bg-muted text-center min-w-[180px]">
+                <div className="space-y-1">
+                  <p className="text-sm font-semibold text-foreground">{product.name}</p>
+                  <Badge className="gradient-accent text-white text-xs">{product.price}</Badge>
+                </div>
+              </th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {/* Category */}
+          <tr className="border-b border-border">
+            <td className="p-3 text-sm text-muted-foreground sticky left-0 bg-card">Category</td>
+            {compareProducts.map(product => (
+              <td key={product.id} className="p-3 text-center">
+                <Badge variant="outline" className="text-xs">
+                  {categoryConfig[product.category]?.label || product.category}
+                </Badge>
+              </td>
+            ))}
+          </tr>
+
+          {/* Target Segments */}
+          <tr className="border-b border-border">
+            <td className="p-3 text-sm text-muted-foreground sticky left-0 bg-card">Target Segments</td>
+            {compareProducts.map(product => (
+              <td key={product.id} className="p-3 text-center">
+                <div className="flex flex-wrap gap-1 justify-center">
+                  {product.targetSegments.map(seg => (
+                    <Badge key={seg} variant="secondary" className="text-[10px]">
+                      {segmentLabels[seg]}
+                    </Badge>
+                  ))}
+                </div>
+              </td>
+            ))}
+          </tr>
+
+          {/* Monthly Price */}
+          <tr className="border-b border-border">
+            <td className="p-3 text-sm text-muted-foreground sticky left-0 bg-card">Monthly Price</td>
+            {compareProducts.map(product => (
+              <td key={product.id} className="p-3 text-center">
+                <span className="text-lg font-bold text-primary">
+                  {product.monthlyPrice > 0 ? `$${product.monthlyPrice}` : 'Custom'}
+                </span>
+              </td>
+            ))}
+          </tr>
+
+          {/* Features Comparison */}
+          <tr>
+            <td colSpan={compareProducts.length + 1} className="p-3 bg-muted">
+              <span className="text-xs font-semibold text-foreground uppercase tracking-wide">
+                Features Comparison
+              </span>
+            </td>
+          </tr>
+          {allFeatures.slice(0, 10).map((feature, idx) => (
+            <tr key={idx} className="border-b border-border/50">
+              <td className="p-3 text-xs text-muted-foreground sticky left-0 bg-card">
+                {feature}
+              </td>
+              {compareProducts.map(product => (
+                <td key={product.id} className="p-3 text-center">
+                  {product.features.includes(feature) ? (
+                    <Check className="w-5 h-5 text-success mx-auto" />
+                  ) : (
+                    <X className="w-5 h-5 text-muted-foreground/30 mx-auto" />
+                  )}
+                </td>
+              ))}
+            </tr>
+          ))}
+
+          {/* Best For */}
+          <tr>
+            <td colSpan={compareProducts.length + 1} className="p-3 bg-muted">
+              <span className="text-xs font-semibold text-foreground uppercase tracking-wide">
+                Best For
+              </span>
+            </td>
+          </tr>
+          <tr className="border-b border-border">
+            <td className="p-3 text-sm text-muted-foreground sticky left-0 bg-card">Use Cases</td>
+            {compareProducts.map(product => (
+              <td key={product.id} className="p-3 text-center">
+                <div className="flex flex-wrap gap-1 justify-center">
+                  {product.bestFor.slice(0, 3).map((use, idx) => (
+                    <Badge key={idx} variant="outline" className="text-[10px]">
+                      {use}
+                    </Badge>
+                  ))}
+                </div>
+              </td>
+            ))}
+          </tr>
+
+          {/* Competitive Advantages */}
+          <tr>
+            <td colSpan={compareProducts.length + 1} className="p-3 bg-muted">
+              <span className="text-xs font-semibold text-foreground uppercase tracking-wide">
+                Competitive Advantages
+              </span>
+            </td>
+          </tr>
+          {[0, 1].map(idx => (
+            <tr key={idx} className="border-b border-border/50">
+              <td className="p-3 text-xs text-muted-foreground sticky left-0 bg-card">
+                Advantage {idx + 1}
+              </td>
+              {compareProducts.map(product => (
+                <td key={product.id} className="p-3 text-center text-xs text-foreground">
+                  {product.competitiveAdvantages[idx] || '-'}
+                </td>
+              ))}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
 interface SolutionsCatalogPageProps {
   initialExpandedProduct?: string | null;
 }
@@ -37,19 +184,18 @@ export function SolutionsCatalogPage({ initialExpandedProduct }: SolutionsCatalo
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [compareList, setCompareList] = useState<string[]>([]);
   const [showCompare, setShowCompare] = useState(false);
-  const [expandedProducts, setExpandedProducts] = useState<Set<string>>(
-    initialExpandedProduct ? new Set([initialExpandedProduct]) : new Set()
-  );
-  
-  // Update expanded products when prop changes
-  useEffect(() => {
+  const [manuallyExpanded, setManuallyExpanded] = useState<Set<string>>(new Set());
+
+  const expandedProducts = useMemo(() => {
+    const set = new Set(manuallyExpanded);
     if (initialExpandedProduct) {
-      setExpandedProducts(prev => new Set([...prev, initialExpandedProduct]));
+      set.add(initialExpandedProduct);
     }
-  }, [initialExpandedProduct]);
+    return set;
+  }, [manuallyExpanded, initialExpandedProduct]);
 
   const toggleExpanded = (productId: string) => {
-    setExpandedProducts(prev => {
+    setManuallyExpanded(prev => {
       const next = new Set(prev);
       if (next.has(productId)) {
         next.delete(productId);
@@ -218,155 +364,6 @@ export function SolutionsCatalogPage({ initialExpandedProduct }: SolutionsCatalo
     );
   };
 
-  const CompareView = () => {
-    if (compareProducts.length < 2) {
-      return (
-        <div className="text-center py-12">
-          <Scale className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-          <h3 className="text-lg font-semibold text-foreground mb-2">Select Products to Compare</h3>
-          <p className="text-sm text-muted-foreground">
-            Choose 2-4 products from the catalog to see a side-by-side comparison.
-          </p>
-        </div>
-      );
-    }
-
-    // Collect all unique features for comparison
-    const allFeatures = [...new Set(compareProducts.flatMap(p => p.features))];
-
-    return (
-      <div className="overflow-x-auto">
-        <table className="w-full border-collapse">
-          <thead>
-            <tr>
-              <th className="text-left p-3 bg-muted text-sm font-semibold text-foreground sticky left-0 min-w-[150px]">
-                Feature
-              </th>
-              {compareProducts.map(product => (
-                <th key={product.id} className="p-3 bg-muted text-center min-w-[180px]">
-                  <div className="space-y-1">
-                    <p className="text-sm font-semibold text-foreground">{product.name}</p>
-                    <Badge className="gradient-accent text-white text-xs">{product.price}</Badge>
-                  </div>
-                </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {/* Category */}
-            <tr className="border-b border-border">
-              <td className="p-3 text-sm text-muted-foreground sticky left-0 bg-card">Category</td>
-              {compareProducts.map(product => (
-                <td key={product.id} className="p-3 text-center">
-                  <Badge variant="outline" className="text-xs">
-                    {categoryConfig[product.category]?.label || product.category}
-                  </Badge>
-                </td>
-              ))}
-            </tr>
-
-            {/* Target Segments */}
-            <tr className="border-b border-border">
-              <td className="p-3 text-sm text-muted-foreground sticky left-0 bg-card">Target Segments</td>
-              {compareProducts.map(product => (
-                <td key={product.id} className="p-3 text-center">
-                  <div className="flex flex-wrap gap-1 justify-center">
-                    {product.targetSegments.map(seg => (
-                      <Badge key={seg} variant="secondary" className="text-[10px]">
-                        {segmentLabels[seg]}
-                      </Badge>
-                    ))}
-                  </div>
-                </td>
-              ))}
-            </tr>
-
-            {/* Monthly Price */}
-            <tr className="border-b border-border">
-              <td className="p-3 text-sm text-muted-foreground sticky left-0 bg-card">Monthly Price</td>
-              {compareProducts.map(product => (
-                <td key={product.id} className="p-3 text-center">
-                  <span className="text-lg font-bold text-primary">
-                    {product.monthlyPrice > 0 ? `$${product.monthlyPrice}` : 'Custom'}
-                  </span>
-                </td>
-              ))}
-            </tr>
-
-            {/* Features Comparison */}
-            <tr>
-              <td colSpan={compareProducts.length + 1} className="p-3 bg-muted">
-                <span className="text-xs font-semibold text-foreground uppercase tracking-wide">
-                  Features Comparison
-                </span>
-              </td>
-            </tr>
-            {allFeatures.slice(0, 10).map((feature, idx) => (
-              <tr key={idx} className="border-b border-border/50">
-                <td className="p-3 text-xs text-muted-foreground sticky left-0 bg-card">
-                  {feature}
-                </td>
-                {compareProducts.map(product => (
-                  <td key={product.id} className="p-3 text-center">
-                    {product.features.includes(feature) ? (
-                      <Check className="w-5 h-5 text-success mx-auto" />
-                    ) : (
-                      <X className="w-5 h-5 text-muted-foreground/30 mx-auto" />
-                    )}
-                  </td>
-                ))}
-              </tr>
-            ))}
-
-            {/* Best For */}
-            <tr>
-              <td colSpan={compareProducts.length + 1} className="p-3 bg-muted">
-                <span className="text-xs font-semibold text-foreground uppercase tracking-wide">
-                  Best For
-                </span>
-              </td>
-            </tr>
-            <tr className="border-b border-border">
-              <td className="p-3 text-sm text-muted-foreground sticky left-0 bg-card">Use Cases</td>
-              {compareProducts.map(product => (
-                <td key={product.id} className="p-3 text-center">
-                  <div className="flex flex-wrap gap-1 justify-center">
-                    {product.bestFor.slice(0, 3).map((use, idx) => (
-                      <Badge key={idx} variant="outline" className="text-[10px]">
-                        {use}
-                      </Badge>
-                    ))}
-                  </div>
-                </td>
-              ))}
-            </tr>
-
-            {/* Competitive Advantages */}
-            <tr>
-              <td colSpan={compareProducts.length + 1} className="p-3 bg-muted">
-                <span className="text-xs font-semibold text-foreground uppercase tracking-wide">
-                  Competitive Advantages
-                </span>
-              </td>
-            </tr>
-            {[0, 1].map(idx => (
-              <tr key={idx} className="border-b border-border/50">
-                <td className="p-3 text-xs text-muted-foreground sticky left-0 bg-card">
-                  Advantage {idx + 1}
-                </td>
-                {compareProducts.map(product => (
-                  <td key={product.id} className="p-3 text-center text-xs text-foreground">
-                    {product.competitiveAdvantages[idx] || '-'}
-                  </td>
-                ))}
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    );
-  };
-
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -416,7 +413,7 @@ export function SolutionsCatalogPage({ initialExpandedProduct }: SolutionsCatalo
 
       {showCompare && compareList.length >= 2 ? (
         <Card className="p-4">
-          <CompareView />
+          <CompareView compareProducts={compareProducts} />
         </Card>
       ) : (
         <>

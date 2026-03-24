@@ -1,20 +1,19 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { CustomerProfile } from '@/types/customer';
-import { products, getProductById, getProductsBySegment } from '@/data/products';
+import { products, getProductById } from '@/data/products';
 import { CustomerProfileForm } from '@/components/CustomerProfileForm';
 import { Battlecard } from '@/components/Battlecard';
 import { PersonasWidget } from '@/components/PersonasWidget';
 import { CustomerStoriesPage } from '@/components/CustomerStoriesPage';
 import { CompetitorClaimsPage } from '@/components/CompetitorClaimsPage';
 import { ValuePropGenerator } from '@/components/ValuePropGenerator';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Tabs, TabsContent } from '@/components/ui/tabs';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
-import { Zap, Users, Target, BookOpen, Home, Sparkles, FileText, Building2, DollarSign, MapPin, Shield, Package, AlertCircle, Star, Calculator, Eye } from 'lucide-react';
+import { Zap, Users, Target, BookOpen, Sparkles, FileText, Shield, Package, AlertCircle, Star, Calculator, Eye } from 'lucide-react';
 import { SolutionsCatalogPage } from '@/components/SolutionsCatalogPage';
 import attGlobe from '@/assets/att-globe.png';
 import { getIndustryRecommendation } from '@/utils/industryRecommendations';
@@ -42,19 +41,10 @@ const Index = () => {
   const [step, setStep] = useState<Step>('profile');
   const [customerProfile, setCustomerProfile] = useState<CustomerProfile | null>(null);
   const [selectedProducts, setSelectedProducts] = useState<string[]>([]);
-  const [activeTab, setActiveTab] = useState(() => searchParams.get('tab') || 'home');
+  const activeTab = searchParams.get('tab') || 'home';
   const [expandedSolutionProduct, setExpandedSolutionProduct] = useState<string | null>(null);
 
-  // Sync activeTab with URL query parameter
-  useEffect(() => {
-    const tabFromUrl = searchParams.get('tab');
-    if (tabFromUrl && tabFromUrl !== activeTab) {
-      setActiveTab(tabFromUrl);
-    }
-  }, [searchParams]);
-
   const handleTabChange = (tab: string) => {
-    setActiveTab(tab);
     if (tab === 'home') {
       setSearchParams({});
     } else {
@@ -64,7 +54,7 @@ const Index = () => {
 
   const handleViewSolution = (productId: string) => {
     setExpandedSolutionProduct(productId);
-    setActiveTab('solutions');
+    handleTabChange('solutions');
   };
 
   const handleProfileSubmit = (profile: CustomerProfile) => {
@@ -90,8 +80,6 @@ const Index = () => {
 
   const getRecommendedProducts = (profile: CustomerProfile): string[] => {
     const recommendations: string[] = [];
-    const segmentProducts = getProductsBySegment(profile.type);
-
     // Enterprise multi-location gets HSIA-E as primary connectivity
     if (profile.type === 'enterprise' && profile.locations !== '1') {
       recommendations.push('hsia-enterprise');
@@ -289,7 +277,7 @@ const Index = () => {
             </TabsContent>
 
             <TabsContent value="quick-value">
-              <ValuePropGenerator onCreateBattlecard={() => setActiveTab('battlecard')} />
+              <ValuePropGenerator onCreateBattlecard={() => handleTabChange('battlecard')} />
             </TabsContent>
 
             

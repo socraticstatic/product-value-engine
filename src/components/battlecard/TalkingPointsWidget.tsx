@@ -1,30 +1,26 @@
 import { useState } from 'react';
 import { Product } from '@/data/products';
-import { CustomerProfile, priorityOptions, painPointOptions } from '@/types/customer';
+import { CustomerProfile, painPointOptions } from '@/types/customer';
 import { BattlecardWidget } from './BattlecardWidget';
 import { Badge } from '@/components/ui/badge';
 import { MessageSquare, Quote, Lightbulb, Shield, Wifi, HeadphonesIcon, Sparkles, DollarSign, Radio, ChevronDown } from 'lucide-react';
 import { getNeedTagColor } from '@/utils/needTagsSystem';
-import { 
-  getEmpatheticOpener, 
+import {
+  getEmpatheticOpener,
   getPriorityOpener,
-  getCustomerCentricPriority,
   getNuancedPriority
 } from '@/utils/businessImpactLanguage';
-import { 
-  businessGradePillars, 
-  getBestKeyPhrase, 
-  painPointToPillarMap, 
+import {
+  businessGradePillars,
+  painPointToPillarMap,
   priorityToPillarMap,
   getBusinessGradePillar
 } from '@/data/businessGradePillars';
-import { 
-  is5GAdvancedRelevant, 
-  get5GTalkingPointsForIndustry,
-  fiveGKeyTalkingPoints 
+import {
+  is5GAdvancedRelevant,
+  get5GTalkingPointsForIndustry
 } from '@/data/fiveGEducation';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
-import { useDemoMode } from '@/contexts/DemoModeContext';
 import { DemoBlur } from '@/components/ui/DemoBlur';
 
 interface TalkingPointsWidgetProps {
@@ -53,8 +49,6 @@ const pillarIcons: Record<string, typeof Wifi> = {
 
 export function TalkingPointsWidget({ products, customerProfile }: TalkingPointsWidgetProps) {
   const [isOpen, setIsOpen] = useState(true);
-  const { isDemoMode } = useDemoMode();
-
   // Helper to get business-specific phrase
   const getBusinessPhrase = (): string | null => {
     if (!customerProfile.businessDescription?.trim()) return null;
@@ -74,7 +68,7 @@ export function TalkingPointsWidget({ products, customerProfile }: TalkingPoints
       
       if (matchingPoint && points.length < 5) {
         // Use business-specific opener if available
-        let opener = getEmpatheticOpener(painPoint, customerProfile);
+        const opener = getEmpatheticOpener(painPoint, customerProfile);
         
         points.push({
           opener,

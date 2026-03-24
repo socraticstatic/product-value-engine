@@ -277,8 +277,6 @@ function CombinedCompetitiveSnapshot({ productIds }: { productIds: string[] }) {
     return acc;
   }, [] as typeof allHiddenCosts);
 
-  const productNames = selectedProducts.map(p => p.name).join(' + ');
-
   return (
     <Card className="border-primary/20 bg-gradient-to-br from-primary/5 to-transparent">
       <CardHeader className="pb-4">

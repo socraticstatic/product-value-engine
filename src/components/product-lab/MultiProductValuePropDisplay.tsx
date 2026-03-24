@@ -10,8 +10,7 @@ import {
   Zap, MessageSquareQuote, Layers, Building2, ArrowRight, AlertTriangle, Download
 } from 'lucide-react';
 import { toast } from 'sonner';
-import { cn } from '@/lib/utils';
-import { generateMultiProductValueProp, MultiProductValueProp } from '@/utils/multiProductValueProp';
+import { generateMultiProductValueProp } from '@/utils/multiProductValueProp';
 import { CustomerProfile, industryOptions } from '@/types/customer';
 import { ValuePropExportModal } from './ValuePropExportModal';
 
@@ -23,10 +22,40 @@ interface MultiProductValuePropDisplayProps {
   showIndustrySelector?: boolean;
 }
 
-export function MultiProductValuePropDisplay({ 
-  productIds, 
+function CopyBtn({ text, id, copiedSection, onCopy }: { text: string; id: string; copiedSection: string | null; onCopy: (text: string, id: string) => void }) {
+  return (
+    <Button
+      variant="ghost"
+      size="icon"
+      className="h-7 w-7 shrink-0"
+      onClick={(e) => { e.stopPropagation(); onCopy(text, id); }}
+    >
+      {copiedSection === id ? <Check className="w-3.5 h-3.5 text-green-500" /> : <Copy className="w-3.5 h-3.5" />}
+    </Button>
+  );
+}
+
+function SectionHeader({ id, icon: Icon, title, subtitle, expandedSections }: { id: string; icon: React.ElementType; title: string; subtitle?: string; expandedSections: Set<string> }) {
+  return (
+    <CollapsibleTrigger asChild>
+      <CardHeader className="cursor-pointer hover:bg-muted/50 transition-colors py-3">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Icon className="w-4 h-4 text-primary" />
+            <CardTitle className="text-sm font-semibold">{title}</CardTitle>
+          </div>
+          {expandedSections.has(id) ? <ChevronUp className="w-4 h-4 text-muted-foreground" /> : <ChevronDown className="w-4 h-4 text-muted-foreground" />}
+        </div>
+        {subtitle && <p className="text-xs text-muted-foreground ml-6">{subtitle}</p>}
+      </CardHeader>
+    </CollapsibleTrigger>
+  );
+}
+
+export function MultiProductValuePropDisplay({
+  productIds,
   profile: externalProfile,
-  showIndustrySelector = true 
+  showIndustrySelector = true
 }: MultiProductValuePropDisplayProps) {
   const [copiedSection, setCopiedSection] = useState<string | null>(null);
   const [expandedSections, setExpandedSections] = useState<Set<string>>(new Set(['narrative', 'outcomes']));
@@ -49,7 +78,7 @@ export function MultiProductValuePropDisplay({
   const toggleSection = (id: string) => {
     setExpandedSections(prev => {
       const next = new Set(prev);
-      next.has(id) ? next.delete(id) : next.add(id);
+      if (next.has(id)) { next.delete(id); } else { next.add(id); }
       return next;
     });
   };
@@ -60,32 +89,6 @@ export function MultiProductValuePropDisplay({
     toast.success('Copied to clipboard');
     setTimeout(() => setCopiedSection(null), 2000);
   };
-
-  const CopyBtn = ({ text, id }: { text: string; id: string }) => (
-    <Button
-      variant="ghost"
-      size="icon"
-      className="h-7 w-7 shrink-0"
-      onClick={(e) => { e.stopPropagation(); handleCopy(text, id); }}
-    >
-      {copiedSection === id ? <Check className="w-3.5 h-3.5 text-green-500" /> : <Copy className="w-3.5 h-3.5" />}
-    </Button>
-  );
-
-  const SectionHeader = ({ id, icon: Icon, title, subtitle }: { id: string; icon: React.ElementType; title: string; subtitle?: string }) => (
-    <CollapsibleTrigger asChild>
-      <CardHeader className="cursor-pointer hover:bg-muted/50 transition-colors py-3">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Icon className="w-4 h-4 text-primary" />
-            <CardTitle className="text-sm font-semibold">{title}</CardTitle>
-          </div>
-          {expandedSections.has(id) ? <ChevronUp className="w-4 h-4 text-muted-foreground" /> : <ChevronDown className="w-4 h-4 text-muted-foreground" />}
-        </div>
-        {subtitle && <p className="text-xs text-muted-foreground ml-6">{subtitle}</p>}
-      </CardHeader>
-    </CollapsibleTrigger>
-  );
 
   return (
     <div className="space-y-4">
@@ -122,7 +125,7 @@ export function MultiProductValuePropDisplay({
                 <p className="text-sm font-medium">{valueProp.elevatorPitch}</p>
               </DemoBlur>
             </div>
-            <CopyBtn text={valueProp.elevatorPitch} id="pitch" />
+            <CopyBtn text={valueProp.elevatorPitch} id="pitch" copiedSection={copiedSection} onCopy={handleCopy} />
           </CardContent>
         </Card>
       )}
@@ -130,14 +133,14 @@ export function MultiProductValuePropDisplay({
       {/* Combined Narrative */}
       <Collapsible open={expandedSections.has('narrative')} onOpenChange={() => toggleSection('narrative')}>
         <Card>
-          <SectionHeader id="narrative" icon={MessageSquareQuote} title="Combined Solution Narrative" subtitle="Unified story weaving all products together" />
+          <SectionHeader expandedSections={expandedSections} id="narrative" icon={MessageSquareQuote} title="Combined Solution Narrative" subtitle="Unified story weaving all products together" />
           <CollapsibleContent>
             <CardContent className="pt-0 pb-4">
               <DemoBlur>
                 <p className="text-sm leading-relaxed">{valueProp.combinedNarrative}</p>
               </DemoBlur>
               <div className="flex justify-end mt-2">
-                <CopyBtn text={valueProp.combinedNarrative} id="narrative" />
+                <CopyBtn text={valueProp.combinedNarrative} id="narrative" copiedSection={copiedSection} onCopy={handleCopy} />
               </div>
             </CardContent>
           </CollapsibleContent>
@@ -148,7 +151,7 @@ export function MultiProductValuePropDisplay({
       {valueProp.perProduct.length > 1 && (
         <Collapsible open={expandedSections.has('perProduct')} onOpenChange={() => toggleSection('perProduct')}>
           <Card>
-            <SectionHeader id="perProduct" icon={Layers} title="Each Product's Role" subtitle="How each product contributes to the solution" />
+            <SectionHeader expandedSections={expandedSections} id="perProduct" icon={Layers} title="Each Product's Role" subtitle="How each product contributes to the solution" />
             <CollapsibleContent>
               <CardContent className="pt-0 pb-4 space-y-3">
                 {valueProp.perProduct.map((pp) => (
@@ -173,7 +176,7 @@ export function MultiProductValuePropDisplay({
       {/* Customer Outcomes */}
       <Collapsible open={expandedSections.has('outcomes')} onOpenChange={() => toggleSection('outcomes')}>
         <Card>
-          <SectionHeader id="outcomes" icon={Target} title="Customer Outcomes" subtitle="What the customer actually experiences" />
+          <SectionHeader expandedSections={expandedSections} id="outcomes" icon={Target} title="Customer Outcomes" subtitle="What the customer actually experiences" />
           <CollapsibleContent>
             <CardContent className="pt-0 pb-4 space-y-3">
               {valueProp.outcomes.map((outcome, i) => (
@@ -202,7 +205,7 @@ export function MultiProductValuePropDisplay({
       {/* Competitive Positioning */}
       <Collapsible open={expandedSections.has('competitive')} onOpenChange={() => toggleSection('competitive')}>
         <Card>
-          <SectionHeader id="competitive" icon={Shield} title="Competitive Positioning" subtitle="Why AT&T multi-product beats mixing vendors" />
+          <SectionHeader expandedSections={expandedSections} id="competitive" icon={Shield} title="Competitive Positioning" subtitle="Why AT&T multi-product beats mixing vendors" />
           <CollapsibleContent>
             <CardContent className="pt-0 pb-4 space-y-4">
               <DemoBlur>
@@ -255,9 +258,11 @@ export function MultiProductValuePropDisplay({
               )}
 
               <div className="flex justify-end">
-                <CopyBtn 
-                  text={`${valueProp.competitivePositioning.primaryMessage}\n\n${valueProp.competitivePositioning.vendorComplexityRisk}\n\nAT&T Advantages:\n${valueProp.competitivePositioning.attAdvantages.map(a => `• ${a}`).join('\n')}`} 
-                  id="competitive" 
+                <CopyBtn
+                  text={`${valueProp.competitivePositioning.primaryMessage}\n\n${valueProp.competitivePositioning.vendorComplexityRisk}\n\nAT&T Advantages:\n${valueProp.competitivePositioning.attAdvantages.map(a => `• ${a}`).join('\n')}`}
+                  id="competitive"
+                  copiedSection={copiedSection}
+                  onCopy={handleCopy}
                 />
               </div>
             </CardContent>
@@ -269,7 +274,7 @@ export function MultiProductValuePropDisplay({
       {valueProp.synergies.length > 0 && (
         <Collapsible open={expandedSections.has('synergies')} onOpenChange={() => toggleSection('synergies')}>
           <Card>
-            <SectionHeader id="synergies" icon={Zap} title="Solution Synergies" subtitle="How the products amplify each other" />
+            <SectionHeader expandedSections={expandedSections} id="synergies" icon={Zap} title="Solution Synergies" subtitle="How the products amplify each other" />
             <CollapsibleContent>
               <CardContent className="pt-0 pb-4 space-y-2">
                 {valueProp.synergies.map((syn, i) => (
@@ -290,7 +295,7 @@ export function MultiProductValuePropDisplay({
       {valueProp.industryInsights.length > 0 && (
         <Collapsible open={expandedSections.has('industry')} onOpenChange={() => toggleSection('industry')}>
           <Card className="border-accent/30">
-            <SectionHeader id="industry" icon={Building2} title="Industry Insights" subtitle={`Tailored for ${industryOptions.find(o => o.id === (effectiveProfile?.industry))?.label || 'your industry'}`} />
+            <SectionHeader expandedSections={expandedSections} id="industry" icon={Building2} title="Industry Insights" subtitle={`Tailored for ${industryOptions.find(o => o.id === (effectiveProfile?.industry))?.label || 'your industry'}`} />
             <CollapsibleContent>
               <CardContent className="pt-0 pb-4 space-y-2">
                 {valueProp.industryInsights.map((insight, i) => (

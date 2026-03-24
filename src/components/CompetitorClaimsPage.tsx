@@ -204,7 +204,6 @@ export const CompetitorClaimsPage: React.FC = () => {
   const [copiedSection, setCopiedSection] = useState<string | null>(null);
   const [savedClaims, setSavedClaims] = useState<SavedClaim[]>([]);
   const [isHistoryOpen, setIsHistoryOpen] = useState(false);
-  const [expandedClaimId, setExpandedClaimId] = useState<string | null>(null);
   const [currentClaimText, setCurrentClaimText] = useState('');
   const [customerResponses, setCustomerResponses] = useState<CustomerResponses>({});
   const [isGeneratingRecommendation, setIsGeneratingRecommendation] = useState(false);

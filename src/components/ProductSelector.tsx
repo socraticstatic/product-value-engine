@@ -1,6 +1,5 @@
 import { products, Product } from '@/data/products';
 import { Card } from '@/components/ui/card';
-import { Checkbox } from '@/components/ui/checkbox';
 import { Badge } from '@/components/ui/badge';
 import { Wifi, Phone, Smartphone, Package, Radio, Shield, Check } from 'lucide-react';
 

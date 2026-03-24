@@ -75,7 +75,7 @@ export function FeedbackStudioTab({
             {/* Research Objective */}
             <div className="space-y-2">
               <label className="text-sm font-medium">Research Objective</label>
-              <Select value={focusArea} onValueChange={(v: any) => setFocusArea(v)}>
+              <Select value={focusArea} onValueChange={(v: string) => setFocusArea(v)}>
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>

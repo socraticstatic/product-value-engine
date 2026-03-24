@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { EnhancedSegmentFit, DimensionFitResult } from '@/utils/segmentFitScoring';
+import { EnhancedSegmentFit } from '@/utils/segmentFitScoring';
 import { 
   aggregateSegmentCharacteristics, 
   getBusinessProfileSummary,
@@ -8,7 +8,8 @@ import {
 } from '@/utils/segmentAggregation';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
+
+
 import { TrendingUp, Users, Check, CircleDot, Building2 } from 'lucide-react';
 import { SegmentNeedsBar } from './SegmentNeedsBar';
 import { cn } from '@/lib/utils';
@@ -184,7 +185,7 @@ export function TopSegmentCard({ allDimensionFits }: TopSegmentCardProps) {
           <div className="pt-2 border-t">
             <p className="text-xs text-muted-foreground mb-2">Other Strong Segments:</p>
             <div className="flex flex-wrap gap-2">
-              {otherStrongSegments.map(({ segment, dimensionLabel }) => (
+              {otherStrongSegments.map(({ segment }) => (
                 <Badge 
                   key={`${segment.dimension}-${segment.value}`}
                   variant="outline"

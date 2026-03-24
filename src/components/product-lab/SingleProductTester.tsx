@@ -9,7 +9,6 @@ import { ExpandableList, ExpandableGrid } from './ExpandableList';
 
 import { CompetitiveSnapshotCard } from './CompetitiveSnapshotCard';
 import { CheckCircle2, Crosshair, FileText, BarChart3, Package, X, Zap, Layers } from 'lucide-react';
-import { useDemoMode } from '@/contexts/DemoModeContext';
 import { DemoBlur } from '@/components/ui/DemoBlur';
 import { cn } from '@/lib/utils';
 import { getProductDifferentiators } from '@/data/competitiveDifferentiation';
@@ -28,8 +27,6 @@ const segmentLabels: Record<string, string> = {
 
 export function SingleProductTester({ selectedProducts, onProductsChange }: SingleProductTesterProps) {
   const [activeSubTab, setActiveSubTab] = useState('details');
-  const { isDemoMode } = useDemoMode();
-
   const selectedProductObjects = selectedProducts
     .map(id => products.find(p => p.id === id))
     .filter((p): p is Product => p !== undefined);
