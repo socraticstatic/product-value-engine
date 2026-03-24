@@ -1,9 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version',
-};
+import { getCorsHeaders, handleCors, sanitizeForPrompt, sanitizeArrayForPrompt, requireApiKey, handleAiGatewayError, errorResponse } from "../_shared/security.ts";
 
 interface BusinessProfile {
   companyName: string;
@@ -31,15 +27,12 @@ const AT_T_PRODUCTS = [
 
 serve(async (req) => {
   // Handle CORS preflight
-  if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
-  }
+  const corsResponse = handleCors(req);
+  if (corsResponse) return corsResponse;
 
   try {
-    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-    if (!LOVABLE_API_KEY) {
-      throw new Error("LOVABLE_API_KEY is not configured");
-    }
+    const corsHeaders = getCorsHeaders(req);
+    const LOVABLE_API_KEY = requireApiKey();
 
     const { profile } = await req.json() as { profile: BusinessProfile };
 
@@ -66,12 +59,12 @@ For each recommendation, provide:
 8. Potential annual loss from inaction
 
 Consider:
-- Industry: ${profile.industry}
-- Business size: ${profile.businessSize}
-- Number of locations: ${profile.locations}
-- Pain points: ${profile.painPoints.join(', ')}
-- Priorities: ${profile.priorities.join(', ')}
-${profile.additionalContext ? `- Additional context: ${profile.additionalContext}` : ''}
+- Industry: ${sanitizeForPrompt(profile.industry)}
+- Business size: ${sanitizeForPrompt(profile.businessSize)}
+- Number of locations: ${sanitizeForPrompt(profile.locations)}
+- Pain points: ${sanitizeArrayForPrompt(profile.painPoints).join(', ')}
+- Priorities: ${sanitizeArrayForPrompt(profile.priorities).join(', ')}
+${profile.additionalContext ? `- Additional context: ${sanitizeForPrompt(profile.additionalContext)}` : ''}
 
 Respond with a JSON object containing:
 {
@@ -100,15 +93,13 @@ Recommend 2-4 products, ordered by match score. Be specific to their industry an
 
     const userPrompt = `Analyze this business and recommend AT&T solutions:
 
-Company: ${profile.companyName}
-Industry: ${profile.industry}
-Size: ${profile.businessSize}
-Locations: ${profile.locations}
-Pain Points: ${profile.painPoints.join(', ')}
-Priorities: ${profile.priorities.join(', ')}
-${profile.additionalContext ? `Additional Notes: ${profile.additionalContext}` : ''}`;
-
-    console.log("Calling Lovable AI for business analysis...");
+Company: ${sanitizeForPrompt(profile.companyName)}
+Industry: ${sanitizeForPrompt(profile.industry)}
+Size: ${sanitizeForPrompt(profile.businessSize)}
+Locations: ${sanitizeForPrompt(profile.locations)}
+Pain Points: ${sanitizeArrayForPrompt(profile.painPoints).join(', ')}
+Priorities: ${sanitizeArrayForPrompt(profile.priorities).join(', ')}
+${profile.additionalContext ? `Additional Notes: ${sanitizeForPrompt(profile.additionalContext)}` : ''}`;
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -127,23 +118,12 @@ ${profile.additionalContext ? `Additional Notes: ${profile.additionalContext}` :
       }),
     });
 
+    const gatewayError = handleAiGatewayError(response, corsHeaders);
+    if (gatewayError) return gatewayError;
+
     if (!response.ok) {
       const errorText = await response.text();
-      console.error("AI gateway error:", response.status, errorText);
-      
-      if (response.status === 429) {
-        return new Response(
-          JSON.stringify({ error: "Rate limit exceeded. Please try again in a moment." }),
-          { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-        );
-      }
-      if (response.status === 402) {
-        return new Response(
-          JSON.stringify({ error: "AI credits exhausted. Please contact support." }),
-          { status: 402, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-        );
-      }
-      
+      console.error("AI gateway error:", response.status);
       throw new Error(`AI gateway error: ${response.status}`);
     }
 
@@ -154,8 +134,6 @@ ${profile.additionalContext ? `Additional Notes: ${profile.additionalContext}` :
       throw new Error("No content in AI response");
     }
 
-    console.log("AI response received, parsing...");
-
     // Parse JSON from the response (handle markdown code blocks)
     let parsedContent;
     try {
@@ -164,7 +142,7 @@ ${profile.additionalContext ? `Additional Notes: ${profile.additionalContext}` :
       const jsonString = jsonMatch ? jsonMatch[1].trim() : content.trim();
       parsedContent = JSON.parse(jsonString);
     } catch (parseError) {
-      console.error("Failed to parse AI response:", content);
+      console.error("Failed to parse AI response");
       // Return a fallback response
       parsedContent = {
         recommendations: [
@@ -175,7 +153,7 @@ ${profile.additionalContext ? `Additional Notes: ${profile.additionalContext}` :
             matchScore: 85,
             description: "High-speed fiber internet with built-in 5G backup",
             whyRecommended: "Based on your reliability and speed priorities",
-            industryUseCase: `Ideal for ${profile.industry} businesses needing consistent connectivity`,
+            industryUseCase: `Ideal for ${sanitizeForPrompt(profile.industry)} businesses needing consistent connectivity`,
             estimatedSavings: "$15,000 - $30,000 annually",
             paybackPeriod: "6-8 months",
             valueDrivers: ["99.9% reliability", "Built-in 5G backup", "Symmetrical speeds"],
@@ -185,11 +163,9 @@ ${profile.additionalContext ? `Additional Notes: ${profile.additionalContext}` :
           }
         ],
         summary: "Based on your profile, we recommend solutions focused on reliability and performance.",
-        industryInsights: `${profile.industry} businesses typically see significant ROI from improved connectivity.`
+        industryInsights: `${sanitizeForPrompt(profile.industry)} businesses typically see significant ROI from improved connectivity.`
       };
     }
-
-    console.log("Returning analysis result");
 
     return new Response(
       JSON.stringify(parsedContent),
@@ -198,8 +174,9 @@ ${profile.additionalContext ? `Additional Notes: ${profile.additionalContext}` :
 
   } catch (error) {
     console.error("Error in analyze-business:", error);
+    const corsHeaders = getCorsHeaders(req);
     const errorMessage = error instanceof Error ? error.message : "Unknown error occurred";
-    
+
     return new Response(
       JSON.stringify({ error: errorMessage }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }

@@ -75,14 +75,13 @@ export async function fetchCompetitorIntel(
   if (!forceRefresh) {
     const cached = getCachedIntel(productId);
     if (cached) {
-      console.log("Using cached competitor intel for", productId);
+      // Using cached data
       return cached;
     }
   }
 
   const competitors = productCompetitors[productId] || ["Comcast Business", "Verizon Business"];
 
-  console.log("Fetching live competitor intel for", productId);
 
   const { data, error } = await supabase.functions.invoke("competitor-intel", {
     body: { productId, productName, competitors }

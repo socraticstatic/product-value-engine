@@ -1,11 +1,7 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { z } from "https://deno.land/x/zod@v3.22.4/mod.ts";
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
+import { getCorsHeaders, handleCors, sanitizeForPrompt, requireApiKey, handleAiGatewayError, errorResponse } from "../_shared/security.ts";
 
 // Input validation schema
 const claimRequestSchema = z.object({
@@ -15,34 +11,31 @@ const claimRequestSchema = z.object({
 });
 
 serve(async (req) => {
-  if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
-  }
+  const corsResponse = handleCors(req);
+  if (corsResponse) return corsResponse;
 
   try {
+    const corsHeaders = getCorsHeaders(req);
+
     // Parse and validate input
     const rawBody = await req.json();
     const parseResult = claimRequestSchema.safeParse(rawBody);
-    
+
     if (!parseResult.success) {
       return new Response(
         JSON.stringify({ error: "Invalid input", details: parseResult.error.flatten() }),
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
-    
+
     const { claim, competitor, productCategory } = parseResult.data;
-    
-    // Sanitize inputs by trimming
-    const sanitizedClaim = claim.trim();
-    const sanitizedCompetitor = competitor?.trim() || null;
-    const sanitizedProductCategory = productCategory?.trim() || null;
-    
-    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-    
-    if (!LOVABLE_API_KEY) {
-      throw new Error("LOVABLE_API_KEY is not configured");
-    }
+
+    // Sanitize inputs
+    const sanitizedClaim = sanitizeForPrompt(claim);
+    const sanitizedCompetitor = competitor ? sanitizeForPrompt(competitor.trim()) : null;
+    const sanitizedProductCategory = productCategory ? sanitizeForPrompt(productCategory.trim()) : null;
+
+    const LOVABLE_API_KEY = requireApiKey();
 
     const systemPrompt = `You are an expert AT&T Business sales consultant helping sellers respond to competitor claims they hear from customers. Your role is to provide nuanced, honest, and practical responses that acknowledge the "not apples-to-apples" nature of competitive comparisons.
 
@@ -99,8 +92,6 @@ Frame these as natural, consultative questions you'd ask a customer sitting acro
 
 Format your response as JSON with these exact keys: claimAnalysis, notApplesToApples (array of strings), attAdvantage, suggestedResponse, questionsToAsk (array of strings)`;
 
-    console.log("Processing competitor claim (length:", sanitizedClaim.length, ")");
-
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
       headers: {
@@ -116,28 +107,17 @@ Format your response as JSON with these exact keys: claimAnalysis, notApplesToAp
       }),
     });
 
+    const gatewayError = handleAiGatewayError(response, corsHeaders);
+    if (gatewayError) return gatewayError;
+
     if (!response.ok) {
-      if (response.status === 429) {
-        return new Response(JSON.stringify({ error: "Rate limit exceeded. Please try again in a moment." }), {
-          status: 429,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
-      }
-      if (response.status === 402) {
-        return new Response(JSON.stringify({ error: "Payment required. Please add credits to continue." }), {
-          status: 402,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
-      }
       const errorText = await response.text();
-      console.error("AI gateway error:", response.status, errorText);
+      console.error("AI gateway error:", response.status);
       throw new Error(`AI gateway error: ${response.status}`);
     }
 
     const data = await response.json();
     const content = data.choices?.[0]?.message?.content;
-    
-    console.log("AI response received successfully");
 
     // Parse the JSON response from the AI
     let parsedResponse;
@@ -147,7 +127,7 @@ Format your response as JSON with these exact keys: claimAnalysis, notApplesToAp
       const jsonStr = jsonMatch ? (jsonMatch[1] || jsonMatch[0]) : content;
       parsedResponse = JSON.parse(jsonStr);
     } catch (parseError) {
-      console.error("Failed to parse AI response as JSON:", parseError);
+      console.error("Failed to parse AI response as JSON");
       // Return raw content if parsing fails
       parsedResponse = { rawContent: content };
     }
@@ -157,6 +137,7 @@ Format your response as JSON with these exact keys: claimAnalysis, notApplesToAp
     });
   } catch (error) {
     console.error("Error in claim-response function:", error);
+    const corsHeaders = getCorsHeaders(req);
     const errorMessage = error instanceof Error ? error.message : "Unknown error";
     return new Response(JSON.stringify({ error: errorMessage }), {
       status: 500,

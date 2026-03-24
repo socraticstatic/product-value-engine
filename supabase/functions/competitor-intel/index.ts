@@ -1,10 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { z } from "https://deno.land/x/zod@v3.22.4/mod.ts";
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
+import { getCorsHeaders, handleCors, sanitizeForPrompt, sanitizeArrayForPrompt, requireApiKey, handleAiGatewayError, errorResponse } from "../_shared/security.ts";
 
 // Input validation schema
 const competitorIntelSchema = z.object({
@@ -14,41 +10,36 @@ const competitorIntelSchema = z.object({
 });
 
 serve(async (req) => {
-  if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
-  }
+  const corsResponse = handleCors(req);
+  if (corsResponse) return corsResponse;
 
   try {
+    const corsHeaders = getCorsHeaders(req);
+
     // Parse and validate input
     const rawBody = await req.json();
     const parseResult = competitorIntelSchema.safeParse(rawBody);
-    
+
     if (!parseResult.success) {
       return new Response(
         JSON.stringify({ error: "Invalid input", details: parseResult.error.flatten() }),
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
-    
+
     const { productId, productName, competitors } = parseResult.data;
-    
-    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-    
-    if (!LOVABLE_API_KEY) {
-      throw new Error("LOVABLE_API_KEY is not configured");
-    }
 
-    console.log(`Researching competitors for ${productName}: ${competitors.join(', ')}`);
+    const LOVABLE_API_KEY = requireApiKey();
 
-    const systemPrompt = `You are a competitive intelligence analyst for AT&T Business sales teams. 
+    const systemPrompt = `You are a competitive intelligence analyst for AT&T Business sales teams.
 Your job is to provide accurate, up-to-date information about competitor business internet, voice, and wireless offerings.
 Focus on: current pricing, contract terms, included features, hidden fees, and how AT&T compares.
 Be factual and specific - include actual pricing when known.
 Current date: ${new Date().toISOString().split('T')[0]}`;
 
-    const userPrompt = `Research current business offerings from these competitors: ${competitors.join(', ')}
+    const userPrompt = `Research current business offerings from these competitors: ${sanitizeArrayForPrompt(competitors).join(', ')}
 
-Compare them to AT&T's ${productName} product.
+Compare them to AT&T's ${sanitizeForPrompt(productName)} product.
 
 For each competitor, provide:
 1. Their current offer details and pricing
@@ -84,23 +75,23 @@ Be specific about current market pricing and offers.`;
                     items: {
                       type: "object",
                       properties: {
-                        competitor: { 
+                        competitor: {
                           type: "string",
                           description: "Name of the competitor (e.g., 'Comcast Business', 'Verizon Business')"
                         },
-                        theirOffer: { 
+                        theirOffer: {
                           type: "string",
                           description: "Their current offer with pricing (e.g., '1 Gbps / 35 Mbps upload, $299/mo with 3-year contract')"
                         },
-                        attAdvantage: { 
+                        attAdvantage: {
                           type: "string",
                           description: "Key advantages AT&T has over this competitor"
                         },
-                        nuance: { 
+                        nuance: {
                           type: "string",
                           description: "Important context or nuance salespeople should know"
                         },
-                        winningStatement: { 
+                        winningStatement: {
                           type: "string",
                           description: "A persuasive statement to use when competing against this offer"
                         },
@@ -133,46 +124,26 @@ Be specific about current market pricing and offers.`;
       }),
     });
 
+    const gatewayError = handleAiGatewayError(response, corsHeaders);
+    if (gatewayError) return gatewayError;
+
     if (!response.ok) {
       const errorText = await response.text();
-      console.error("AI gateway error:", response.status, errorText);
-      
-      if (response.status === 429) {
-        return new Response(JSON.stringify({ 
-          error: "Rate limit exceeded. Please try again later.",
-          code: "RATE_LIMIT"
-        }), {
-          status: 429,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
-      }
-      
-      if (response.status === 402) {
-        return new Response(JSON.stringify({ 
-          error: "AI credits exhausted. Please add credits to continue.",
-          code: "PAYMENT_REQUIRED"
-        }), {
-          status: 402,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
-      }
-      
+      console.error("AI gateway error:", response.status);
       throw new Error(`AI gateway error: ${response.status}`);
     }
 
     const data = await response.json();
-    console.log("AI response received");
 
     // Extract the tool call result
     const toolCall = data.choices?.[0]?.message?.tool_calls?.[0];
-    
+
     if (!toolCall || toolCall.function.name !== "provide_competitor_intel") {
-      console.error("Unexpected response format:", data);
       throw new Error("AI did not return structured data");
     }
 
     const intelData = JSON.parse(toolCall.function.arguments);
-    
+
     return new Response(JSON.stringify({
       success: true,
       productId,
@@ -184,7 +155,8 @@ Be specific about current market pricing and offers.`;
 
   } catch (error) {
     console.error("Error in competitor-intel function:", error);
-    return new Response(JSON.stringify({ 
+    const corsHeaders = getCorsHeaders(req);
+    return new Response(JSON.stringify({
       error: error instanceof Error ? error.message : "Unknown error",
       code: "INTERNAL_ERROR"
     }), {

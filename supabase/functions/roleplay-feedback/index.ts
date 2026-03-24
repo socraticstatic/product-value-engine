@@ -1,10 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { z } from "https://deno.land/x/zod@v3.22.4/mod.ts";
-
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
-};
+import { getCorsHeaders, handleCors, sanitizeForPrompt, sanitizeArrayForPrompt, requireApiKey, handleAiGatewayError, errorResponse } from "../_shared/security.ts";
 
 // Input validation schemas
 const messageSchema = z.object({
@@ -25,37 +21,34 @@ const feedbackRequestSchema = z.object({
 });
 
 serve(async (req) => {
-  if (req.method === "OPTIONS") {
-    return new Response(null, { headers: corsHeaders });
-  }
+  const corsResponse = handleCors(req);
+  if (corsResponse) return corsResponse;
 
   try {
+    const corsHeaders = getCorsHeaders(req);
+
     // Parse and validate input
     const rawBody = await req.json();
     const parseResult = feedbackRequestSchema.safeParse(rawBody);
-    
+
     if (!parseResult.success) {
       return new Response(
         JSON.stringify({ error: "Invalid input", details: parseResult.error.flatten() }),
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
-    
-    const { messages, persona } = parseResult.data;
-    
-    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
 
-    if (!LOVABLE_API_KEY) {
-      throw new Error("LOVABLE_API_KEY is not configured");
-    }
+    const { messages, persona } = parseResult.data;
+
+    const LOVABLE_API_KEY = requireApiKey();
 
     const systemPrompt = `You are a sales coaching assistant evaluating a mock role-play conversation between an AT&T sales representative (the human) and a prospective customer persona.
 
 Persona summary:
-- Name: ${persona.name}
-- Title: ${persona.title}
-- Company: ${persona.company}
-- Industry: ${persona.industry}
+- Name: ${sanitizeForPrompt(persona.name)}
+- Title: ${sanitizeForPrompt(persona.title)}
+- Company: ${sanitizeForPrompt(persona.company)}
+- Industry: ${sanitizeForPrompt(persona.industry)}
 
 The conversation messages are provided below as alternating "user" (sales rep) and "assistant" (customer persona) turns.
 
@@ -100,29 +93,8 @@ Where to improve:
     );
 
     if (!response.ok) {
-      if (response.status === 429) {
-        return new Response(
-          JSON.stringify({
-            error: "Rate limit exceeded. Please wait a moment before requesting feedback again.",
-          }),
-          {
-            status: 429,
-            headers: { ...corsHeaders, "Content-Type": "application/json" },
-          },
-        );
-      }
-      if (response.status === 402) {
-        return new Response(
-          JSON.stringify({
-            error:
-              "AI credits exhausted. Please add credits in workspace settings to continue using feedback.",
-          }),
-          {
-            status: 402,
-            headers: { ...corsHeaders, "Content-Type": "application/json" },
-          },
-        );
-      }
+      const gatewayError = handleAiGatewayError(response, corsHeaders);
+      if (gatewayError) return gatewayError;
 
       const errorText = await response.text();
       console.error("AI gateway feedback error:", response.status, errorText);
@@ -148,7 +120,7 @@ Where to improve:
       JSON.stringify({ error: error instanceof Error ? error.message : "Unknown error" }),
       {
         status: 500,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        headers: { ...getCorsHeaders(req), "Content-Type": "application/json" },
       },
     );
   }

@@ -1,10 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { z } from "https://deno.land/x/zod@v3.22.4/mod.ts";
-
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
-};
+import { getCorsHeaders, handleCors, sanitizeForPrompt, sanitizeArrayForPrompt, requireApiKey, handleAiGatewayError, errorResponse } from "../_shared/security.ts";
 
 // Input validation schemas
 const productSchema = z.object({
@@ -53,45 +49,39 @@ const requestSchema = z.object({
 });
 
 serve(async (req) => {
-  if (req.method === "OPTIONS") {
-    return new Response(null, { headers: corsHeaders });
-  }
+  const corsResponse = handleCors(req);
+  if (corsResponse) return corsResponse;
 
   try {
+    const corsHeaders = getCorsHeaders(req);
     const rawBody = await req.json();
     const parseResult = requestSchema.safeParse(rawBody);
-    
+
     if (!parseResult.success) {
       return new Response(
         JSON.stringify({ error: "Invalid input", details: parseResult.error.flatten() }),
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
-    
-    const { persona, products, focusArea, competitorContext, specificQuestion, messages, isStart } = parseResult.data;
-    
-    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-    
-    if (!LOVABLE_API_KEY) {
-      throw new Error("LOVABLE_API_KEY is not configured");
-    }
 
-    console.log("Product feedback request for persona:", persona.name, "products:", products.map(p => p.name).join(', '));
+    const { persona, products, focusArea, competitorContext, specificQuestion, messages, isStart } = parseResult.data;
+
+    const LOVABLE_API_KEY = requireApiKey();
 
     // Build product descriptions
-    const productDescriptions = products.map(p => 
-      `**${p.name}** ($${p.monthlyPrice}/mo):\n` +
-      `- Features: ${p.features.slice(0, 4).join('; ')}\n` +
-      `- Value Props: ${p.valueProps.slice(0, 3).join('; ')}`
+    const productDescriptions = products.map(p =>
+      `**${sanitizeForPrompt(p.name)}** ($${p.monthlyPrice}/mo):\n` +
+      `- Features: ${sanitizeArrayForPrompt(p.features.slice(0, 4)).join('; ')}\n` +
+      `- Value Props: ${sanitizeArrayForPrompt(p.valueProps.slice(0, 3)).join('; ')}`
     ).join('\n\n');
 
     // Build needs section
-    const topNeedsSection = persona.topNeeds 
-      ? persona.topNeeds.map((n, i) => `${i + 1}. ${n.need} (${n.importance}% importance)`).join('\n')
+    const topNeedsSection = persona.topNeeds
+      ? persona.topNeeds.map((n, i) => `${i + 1}. ${sanitizeForPrompt(n.need)} (${n.importance}% importance)`).join('\n')
       : 'No specific needs defined';
-    
-    const painPointsSection = persona.painPoints 
-      ? persona.painPoints.map(p => `- ${p}`).join('\n')
+
+    const painPointsSection = persona.painPoints
+      ? sanitizeArrayForPrompt(persona.painPoints).map(p => `- ${p}`).join('\n')
       : 'No specific pain points defined';
 
     // Focus area specific instructions - oriented toward product strategy research
@@ -106,7 +96,7 @@ serve(async (req) => {
 - Do you perceive the value proposition as justified for the cost?
 - What pricing concerns or questions would you raise in an evaluation?
 - How does the price-to-value ratio compare to alternatives you've considered?`,
-      comparison: `Compare these products to ${competitorContext || 'other solutions you\'ve evaluated'}:
+      comparison: `Compare these products to ${sanitizeForPrompt(competitorContext || 'other solutions you\'ve evaluated')}:
 - What makes these products stand out or fall short versus alternatives?
 - Where might competitors have a positioning advantage?
 - What would you need to see to choose this solution over alternatives?
@@ -118,7 +108,7 @@ serve(async (req) => {
 - How well does the overall value proposition align with your priorities?`,
     };
 
-    const systemPrompt = `You are role-playing as ${persona.name}, a prospective CUSTOMER being interviewed for product research and feedback.
+    const systemPrompt = `You are role-playing as ${sanitizeForPrompt(persona.name)}, a prospective CUSTOMER being interviewed for product research and feedback.
 
 ## CRITICAL ROLE INSTRUCTIONS:
 - You are being interviewed as a potential BUYER/CUSTOMER to help product teams understand market needs
@@ -130,16 +120,16 @@ serve(async (req) => {
 - Stay in character based on your profile
 
 ## Your Character Profile:
-- **Name**: ${persona.name}
-- **Title**: ${persona.title}
-- **Company**: ${persona.company}
-- **Industry**: ${persona.industry}
-- **Employees**: ${persona.employeeCount || 'Not specified'}
-- **Tech Budget**: ${persona.techBudget || 'Not specified'}
-- **Tech Sophistication**: ${persona.techSophistication || 'medium'}
-- **Buying Behavior**: ${persona.buyingBehavior || 'Not specified'}
-- **Mindset**: ${persona.mindset || 'Not specified'}
-- **Value Tier**: ${persona.valueTier || 'Not specified'}
+- **Name**: ${sanitizeForPrompt(persona.name)}
+- **Title**: ${sanitizeForPrompt(persona.title)}
+- **Company**: ${sanitizeForPrompt(persona.company)}
+- **Industry**: ${sanitizeForPrompt(persona.industry)}
+- **Employees**: ${sanitizeForPrompt(persona.employeeCount || 'Not specified')}
+- **Tech Budget**: ${sanitizeForPrompt(persona.techBudget || 'Not specified')}
+- **Tech Sophistication**: ${sanitizeForPrompt(persona.techSophistication || 'medium')}
+- **Buying Behavior**: ${sanitizeForPrompt(persona.buyingBehavior || 'Not specified')}
+- **Mindset**: ${sanitizeForPrompt(persona.mindset || 'Not specified')}
+- **Value Tier**: ${sanitizeForPrompt(persona.valueTier || 'Not specified')}
 
 ## Your Top Needs:
 ${topNeedsSection}
@@ -148,7 +138,7 @@ ${topNeedsSection}
 ${painPointsSection}
 
 ## Your Quote/Mindset:
-"${persona.quote || 'Looking for the best value for my business.'}"
+"${sanitizeForPrompt(persona.quote || 'Looking for the best value for my business.')}"
 
 ## Products Being Evaluated:
 ${productDescriptions}
@@ -167,10 +157,10 @@ ${focusInstructions[focusArea]}
 8. Provide the kind of honest feedback that helps Product Managers improve offerings
 9. Don't just criticize - explain what would make the product more compelling
 
-${specificQuestion ? `\n## Specific Question to Address:\n${specificQuestion}` : ''}
-${competitorContext ? `\n## Competitor Context:\nYou're comparing this to ${competitorContext}. Reference this in your feedback.` : ''}
+${specificQuestion ? `\n## Specific Question to Address:\n${sanitizeForPrompt(specificQuestion)}` : ''}
+${competitorContext ? `\n## Competitor Context:\nYou're comparing this to ${sanitizeForPrompt(competitorContext)}. Reference this in your feedback.` : ''}
 
-Remember: You are ${persona.name}, evaluating these products for your ${persona.industry} business.`;
+Remember: You are ${sanitizeForPrompt(persona.name)}, evaluating these products for your ${sanitizeForPrompt(persona.industry)} business.`;
 
     // Build messages array
     const chatMessages: { role: string; content: string }[] = [
@@ -178,11 +168,11 @@ Remember: You are ${persona.name}, evaluating these products for your ${persona.
     ];
 
     if (isStart) {
-      chatMessages.push({ 
-        role: "user", 
-        content: specificQuestion 
-          ? specificQuestion 
-          : `You're being presented with the following product(s): ${products.map(p => p.name).join(', ')}. Please share your initial reaction and feedback from your perspective as a ${persona.industry} business owner.`
+      chatMessages.push({
+        role: "user",
+        content: specificQuestion
+          ? sanitizeForPrompt(specificQuestion)
+          : `You're being presented with the following product(s): ${products.map(p => sanitizeForPrompt(p.name)).join(', ')}. Please share your initial reaction and feedback from your perspective as a ${sanitizeForPrompt(persona.industry)} business owner.`
       });
     } else if (messages && messages.length > 0) {
       chatMessages.push(...messages);
@@ -202,18 +192,9 @@ Remember: You are ${persona.name}, evaluating these products for your ${persona.
     });
 
     if (!response.ok) {
-      if (response.status === 429) {
-        return new Response(JSON.stringify({ error: "Rate limit exceeded. Please try again in a moment." }), {
-          status: 429,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
-      }
-      if (response.status === 402) {
-        return new Response(JSON.stringify({ error: "AI credits exhausted. Please add credits in workspace settings." }), {
-          status: 402,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
-      }
+      const gatewayError = handleAiGatewayError(response, corsHeaders);
+      if (gatewayError) return gatewayError;
+
       const errorText = await response.text();
       console.error("AI gateway error:", response.status, errorText);
       return new Response(JSON.stringify({ error: "AI service temporarily unavailable" }), {
@@ -229,7 +210,7 @@ Remember: You are ${persona.name}, evaluating these products for your ${persona.
     console.error("Product feedback chat error:", error);
     return new Response(JSON.stringify({ error: error instanceof Error ? error.message : "Unknown error" }), {
       status: 500,
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
+      headers: { ...getCorsHeaders(req), "Content-Type": "application/json" },
     });
   }
 });
