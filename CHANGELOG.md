@@ -4,6 +4,35 @@ All notable changes to the Product Value Engine project will be documented in th
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [0.4.0] - 2026-03-24
+
+### Changed
+
+- Replaced Plus Jakarta Sans + Inter with ATT Aleck Sans (brand typeface) in 3 weights (400, 500, 700) as WOFF2 files (62KB total)
+- Primary color changed from AT&T Cyan (#009FDB) to Cobalt (#0057b8) per SDCI design library standard
+- Card border-radius increased from 8px (rounded-lg) to 16px (rounded-2xl) per SDCI spec
+- Button shape changed from rounded-lg to rounded-full (pill) per SDCI spec
+- Button sizes aligned to SDCI: sm=28px, default=36px, lg=44px
+- Button font-weight reduced from semibold (600) to medium (500) per SDCI 3-weight limit
+- Applied letter-spacing -0.03em globally on body and headings per SDCI typography spec
+- Border-radius scale aligned to SDCI: 4/6/8/12/16/24px
+- Success color aligned from lime (#91DC00) to forest green (#2d7e24) per SDCI
+- Destructive color aligned from generic red to #c70032 per SDCI
+- Warning color aligned to #ff8500 per SDCI
+- Background color aligned to #f8fafb (SDCI bg-fw-wash)
+- Foreground/heading color aligned to #1d2329 (SDCI text-fw-heading)
+- Muted foreground aligned to #454b52 (SDCI text-fw-body)
+- Input border aligned to #686e74 (SDCI border-fw-primary)
+- Card border aligned to #dcdfe3 (SDCI border-fw-secondary)
+- Ring/focus color aligned to Cobalt #0057b8
+
+### Added
+
+- ATT Aleck Sans @font-face declarations (Regular, Medium, Bold) with font-display: swap
+- SDCI Figma type scale tokens: figma-xs (10px) through figma-5xl (56px)
+- Cards now have subtle border (border-border/50) per SDCI card pattern
+- prefers-reduced-motion media query disables all animations for accessibility
+
 ## [0.3.0] - 2026-03-24
 
 ### Added

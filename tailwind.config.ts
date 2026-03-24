@@ -14,8 +14,19 @@ export default {
     },
     extend: {
       fontFamily: {
-        sans: ['Inter', 'sans-serif'],
-        display: ['Plus Jakarta Sans', 'sans-serif'],
+        sans: ['ATT Aleck Sans', 'Inter', 'system-ui', 'sans-serif'],
+      },
+      fontSize: {
+        /* SDCI Figma type scale */
+        'figma-xs': ['0.625rem', { lineHeight: '1' }],       /* 10px */
+        'figma-sm': ['0.75rem', { lineHeight: '1.33' }],     /* 12px */
+        'figma-base': ['0.875rem', { lineHeight: '1.43' }],  /* 14px */
+        'figma-lg': ['1rem', { lineHeight: '1.5' }],         /* 16px */
+        'figma-xl': ['1.5rem', { lineHeight: '1.33' }],      /* 24px */
+        'figma-2xl': ['2rem', { lineHeight: '1.25' }],       /* 32px */
+        'figma-3xl': ['2.5rem', { lineHeight: '1.2' }],      /* 40px */
+        'figma-4xl': ['3rem', { lineHeight: '1.17' }],       /* 48px */
+        'figma-5xl': ['3.5rem', { lineHeight: '1.14' }],     /* 56px */
       },
       colors: {
         border: "hsl(var(--border))",
@@ -95,9 +106,13 @@ export default {
         },
       },
       borderRadius: {
-        lg: "var(--radius)",
-        md: "calc(var(--radius) - 2px)",
-        sm: "calc(var(--radius) - 4px)",
+        /* SDCI border-radius scale */
+        '3xl': '1.5rem',   /* 24px — modals, role cards */
+        '2xl': '1rem',     /* 16px — cards, containers */
+        'xl': '0.75rem',   /* 12px */
+        'lg': '0.5rem',    /* 8px — inputs, dropdowns */
+        'md': '0.375rem',  /* 6px — segmented controls */
+        'sm': '0.25rem',   /* 4px */
       },
       keyframes: {
         "accordion-down": {

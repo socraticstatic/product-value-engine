@@ -1,4 +1,25 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap');
+/* ATT Aleck Sans — AT&T brand typeface (3 weights per SDCI spec) */
+@font-face {
+  font-family: 'ATT Aleck Sans';
+  src: url('./assets/fonts/ATTAleckSans_Rg.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'ATT Aleck Sans';
+  src: url('./assets/fonts/ATTAleckSans_Md.woff2') format('woff2');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'ATT Aleck Sans';
+  src: url('./assets/fonts/ATTAleckSans_Bd.woff2') format('woff2');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
 
 @tailwind base;
 @tailwind components;
@@ -6,56 +27,56 @@
 
 @layer base {
   :root {
-    /* AT&T Brand Colors - From official palette */
-    --background: 220 14% 96%; /* Gray 1 #F3F4F6 */
-    --foreground: 0 0% 0%; /* Black #000000 */
+    /* AT&T Brand Colors — aligned to SDCI Design Library */
+    --background: 210 20% 98%; /* #f8fafb (SDCI bg-fw-wash) */
+    --foreground: 213 18% 14%; /* #1d2329 (SDCI text-fw-heading) */
 
     --card: 0 0% 100%;
-    --card-foreground: 0 0% 0%;
+    --card-foreground: 213 18% 14%; /* #1d2329 */
 
     --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 0%;
+    --popover-foreground: 213 18% 14%;
 
-    /* AT&T Blue #009FDB - Primary brand color */
-    --primary: 197 100% 43%;
+    /* Cobalt #0057b8 — Primary interactive (SDCI standard) */
+    --primary: 211 100% 36%;
     --primary-foreground: 0 0% 100%;
 
-    /* Cobalt #00388F - Secondary */
-    --secondary: 216 100% 28%;
+    /* AT&T Cyan #009fdb — Secondary/accent */
+    --secondary: 197 100% 43%;
     --secondary-foreground: 0 0% 100%;
 
-    --muted: 214 10% 89%; /* Gray 2 #DCDFE3 */
-    --muted-foreground: 210 10% 30%; /* Darker for better contrast */
+    --muted: 214 10% 89%; /* #DCDFE3 (SDCI border-fw-secondary) */
+    --muted-foreground: 212 8% 35%; /* #454b52 (SDCI text-fw-body) */
 
-    /* Light Blue #00C9FF - Accent */
-    --accent: 193 100% 50%;
-    --accent-foreground: 0 0% 0%;
+    /* Light Blue #009fdb — Accent */
+    --accent: 197 100% 43%;
+    --accent-foreground: 0 0% 100%;
 
-    --destructive: 0 72% 45%;
+    --destructive: 342 100% 39%; /* #c70032 (SDCI text-fw-error) */
     --destructive-foreground: 0 0% 100%;
 
-    --border: 210 6% 76%; /* Gray 3 #BDC2C7 */
-    --input: 210 6% 76%;
-    --ring: 197 100% 43%; /* AT&T Blue */
+    --border: 213 6% 87%; /* #dcdfe3 (SDCI border-fw-secondary) */
+    --input: 210 5% 44%; /* #686e74 (SDCI border-fw-primary / input resting) */
+    --ring: 211 100% 36%; /* Cobalt #0057b8 */
 
-    --radius: 0.75rem;
+    --radius: 1rem; /* 16px — SDCI card radius */
 
-    /* AT&T Brand Extended Palette */
-    --success: 77 100% 43%; /* Lime #91DC00 */
-    --success-foreground: 0 0% 0%;
-    --warning: 38 92% 50%;
+    /* Extended Palette — aligned to SDCI */
+    --success: 118 54% 32%; /* #2d7e24 (SDCI text-fw-success) */
+    --success-foreground: 0 0% 100%;
+    --warning: 30 100% 50%; /* #ff8500 (SDCI warning orange) */
     --warning-foreground: 0 0% 0%;
-    --info: 193 100% 50%; /* Light Blue #00C9FF */
-    --info-foreground: 0 0% 0%;
-    --mint: 173 82% 61%; /* Mint #49EEDC */
+    --info: 197 100% 43%; /* #009fdb (AT&T Cyan) */
+    --info-foreground: 0 0% 100%;
+    --mint: 173 82% 61%; /* #49EEDC */
     --mint-foreground: 0 0% 0%;
-    --cobalt: 216 100% 28%; /* Cobalt #00388F */
+    --cobalt: 211 100% 36%; /* #0057b8 (SDCI primary) */
     --cobalt-foreground: 0 0% 100%;
-    --lime: 77 100% 43%; /* Lime #91DC00 */
+    --lime: 77 100% 43%; /* #91DC00 */
     --lime-foreground: 0 0% 0%;
-    --att-blue: 197 100% 43%; /* AT&T Blue #009FDB */
+    --att-blue: 197 100% 43%; /* #009FDB */
     --att-blue-foreground: 0 0% 100%;
-    --light-blue: 193 100% 50%; /* Light Blue #00C9FF */
+    --light-blue: 193 100% 50%; /* #00C9FF */
     --light-blue-foreground: 0 0% 0%;
 
     /* Gradients using AT&T colors */
@@ -143,11 +164,23 @@
 
   body {
     @apply bg-background text-foreground antialiased;
-    font-family: 'Inter', sans-serif;
+    font-family: 'ATT Aleck Sans', 'Inter', system-ui, sans-serif;
+    letter-spacing: -0.03em;
   }
 
   h1, h2, h3, h4, h5, h6 {
-    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-family: 'ATT Aleck Sans', 'Inter', system-ui, sans-serif;
+    letter-spacing: -0.03em;
+  }
+}
+
+/* Reduced motion — respect user accessibility preferences */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 }
 
