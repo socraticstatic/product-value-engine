@@ -1,22 +1,22 @@
 project_id = "yttpppvuzurerzhsrzmi"
 
 [functions.claim-response]
-verify_jwt = true
+verify_jwt = false
 
 [functions.competitor-intel]
-verify_jwt = true
+verify_jwt = false
 
 [functions.response-recommendation]
-verify_jwt = true
+verify_jwt = false
 
 [functions.roleplay-feedback]
-verify_jwt = true
+verify_jwt = false
 
 [functions.roleplay-chat]
-verify_jwt = true
+verify_jwt = false
 
 [functions.product-feedback-chat]
-verify_jwt = true
+verify_jwt = false
 
 [functions.analyze-business]
-verify_jwt = true
+verify_jwt = false

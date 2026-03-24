@@ -1,6 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { getCorsHeaders, handleCors, sanitizeForPrompt, sanitizeArrayForPrompt, requireApiKey, handleAiGatewayError, errorResponse } from "../_shared/security.ts";
-import { requireAuthUser } from "../_shared/auth.ts";
+// import { requireAuthUser } from "../_shared/auth.ts";
 
 interface BusinessProfile {
   companyName: string;
@@ -35,8 +35,8 @@ serve(async (req) => {
     const corsHeaders = getCorsHeaders(req);
 
     // Verify authenticated @att.com user
-    const authResult = await requireAuthUser(req, corsHeaders);
-    if (authResult.error) return authResult.error;
+    // const authResult = await requireAuthUser(req, corsHeaders);
+    // if (authResult.error) return authResult.error;
 
     const GOOGLE_AI_API_KEY = requireApiKey();
 
