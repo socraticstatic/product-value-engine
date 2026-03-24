@@ -1,0 +1,195 @@
+import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { z } from "https://deno.land/x/zod@v3.22.4/mod.ts";
+
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+};
+
+// Input validation schema
+const competitorIntelSchema = z.object({
+  productId: z.string().min(1).max(100),
+  productName: z.string().min(1).max(200),
+  competitors: z.array(z.string().min(1).max(100)).min(1).max(10),
+});
+
+serve(async (req) => {
+  if (req.method === 'OPTIONS') {
+    return new Response(null, { headers: corsHeaders });
+  }
+
+  try {
+    // Parse and validate input
+    const rawBody = await req.json();
+    const parseResult = competitorIntelSchema.safeParse(rawBody);
+    
+    if (!parseResult.success) {
+      return new Response(
+        JSON.stringify({ error: "Invalid input", details: parseResult.error.flatten() }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+    
+    const { productId, productName, competitors } = parseResult.data;
+    
+    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
+    
+    if (!LOVABLE_API_KEY) {
+      throw new Error("LOVABLE_API_KEY is not configured");
+    }
+
+    console.log(`Researching competitors for ${productName}: ${competitors.join(', ')}`);
+
+    const systemPrompt = `You are a competitive intelligence analyst for AT&T Business sales teams. 
+Your job is to provide accurate, up-to-date information about competitor business internet, voice, and wireless offerings.
+Focus on: current pricing, contract terms, included features, hidden fees, and how AT&T compares.
+Be factual and specific - include actual pricing when known.
+Current date: ${new Date().toISOString().split('T')[0]}`;
+
+    const userPrompt = `Research current business offerings from these competitors: ${competitors.join(', ')}
+
+Compare them to AT&T's ${productName} product.
+
+For each competitor, provide:
+1. Their current offer details and pricing
+2. AT&T's advantage over them
+3. Important nuances salespeople should know
+4. A winning statement to use in sales conversations
+
+Be specific about current market pricing and offers.`;
+
+    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${LOVABLE_API_KEY}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model: "google/gemini-2.5-flash",
+        messages: [
+          { role: "system", content: systemPrompt },
+          { role: "user", content: userPrompt }
+        ],
+        tools: [
+          {
+            type: "function",
+            function: {
+              name: "provide_competitor_intel",
+              description: "Provide structured competitor intelligence data",
+              parameters: {
+                type: "object",
+                properties: {
+                  competitors: {
+                    type: "array",
+                    items: {
+                      type: "object",
+                      properties: {
+                        competitor: { 
+                          type: "string",
+                          description: "Name of the competitor (e.g., 'Comcast Business', 'Verizon Business')"
+                        },
+                        theirOffer: { 
+                          type: "string",
+                          description: "Their current offer with pricing (e.g., '1 Gbps / 35 Mbps upload, $299/mo with 3-year contract')"
+                        },
+                        attAdvantage: { 
+                          type: "string",
+                          description: "Key advantages AT&T has over this competitor"
+                        },
+                        nuance: { 
+                          type: "string",
+                          description: "Important context or nuance salespeople should know"
+                        },
+                        winningStatement: { 
+                          type: "string",
+                          description: "A persuasive statement to use when competing against this offer"
+                        },
+                        priceChange: {
+                          type: "string",
+                          enum: ["up", "down", "same", "unknown"],
+                          description: "Whether their price has changed recently"
+                        },
+                        confidence: {
+                          type: "string",
+                          enum: ["high", "medium", "low"],
+                          description: "Confidence level in this data accuracy"
+                        }
+                      },
+                      required: ["competitor", "theirOffer", "attAdvantage", "nuance", "winningStatement"]
+                    }
+                  },
+                  marketTrends: {
+                    type: "array",
+                    items: { type: "string" },
+                    description: "Notable market trends or recent changes"
+                  }
+                },
+                required: ["competitors"]
+              }
+            }
+          }
+        ],
+        tool_choice: { type: "function", function: { name: "provide_competitor_intel" } }
+      }),
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error("AI gateway error:", response.status, errorText);
+      
+      if (response.status === 429) {
+        return new Response(JSON.stringify({ 
+          error: "Rate limit exceeded. Please try again later.",
+          code: "RATE_LIMIT"
+        }), {
+          status: 429,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+      
+      if (response.status === 402) {
+        return new Response(JSON.stringify({ 
+          error: "AI credits exhausted. Please add credits to continue.",
+          code: "PAYMENT_REQUIRED"
+        }), {
+          status: 402,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+      
+      throw new Error(`AI gateway error: ${response.status}`);
+    }
+
+    const data = await response.json();
+    console.log("AI response received");
+
+    // Extract the tool call result
+    const toolCall = data.choices?.[0]?.message?.tool_calls?.[0];
+    
+    if (!toolCall || toolCall.function.name !== "provide_competitor_intel") {
+      console.error("Unexpected response format:", data);
+      throw new Error("AI did not return structured data");
+    }
+
+    const intelData = JSON.parse(toolCall.function.arguments);
+    
+    return new Response(JSON.stringify({
+      success: true,
+      productId,
+      data: intelData,
+      lastUpdated: new Date().toISOString()
+    }), {
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+
+  } catch (error) {
+    console.error("Error in competitor-intel function:", error);
+    return new Response(JSON.stringify({ 
+      error: error instanceof Error ? error.message : "Unknown error",
+      code: "INTERNAL_ERROR"
+    }), {
+      status: 500,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  }
+});

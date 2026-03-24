@@ -1,0 +1,231 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* AT&T Brand Colors - From official palette */
+    --background: 220 14% 96%; /* Gray 1 #F3F4F6 */
+    --foreground: 0 0% 0%; /* Black #000000 */
+
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 0%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 0%;
+
+    /* AT&T Blue #009FDB - Primary brand color */
+    --primary: 197 100% 43%;
+    --primary-foreground: 0 0% 100%;
+
+    /* Cobalt #00388F - Secondary */
+    --secondary: 216 100% 28%;
+    --secondary-foreground: 0 0% 100%;
+
+    --muted: 214 10% 89%; /* Gray 2 #DCDFE3 */
+    --muted-foreground: 210 10% 30%; /* Darker for better contrast */
+
+    /* Light Blue #00C9FF - Accent */
+    --accent: 193 100% 50%;
+    --accent-foreground: 0 0% 0%;
+
+    --destructive: 0 72% 45%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 210 6% 76%; /* Gray 3 #BDC2C7 */
+    --input: 210 6% 76%;
+    --ring: 197 100% 43%; /* AT&T Blue */
+
+    --radius: 0.75rem;
+
+    /* AT&T Brand Extended Palette */
+    --success: 77 100% 43%; /* Lime #91DC00 */
+    --success-foreground: 0 0% 0%;
+    --warning: 38 92% 50%;
+    --warning-foreground: 0 0% 0%;
+    --info: 193 100% 50%; /* Light Blue #00C9FF */
+    --info-foreground: 0 0% 0%;
+    --mint: 173 82% 61%; /* Mint #49EEDC */
+    --mint-foreground: 0 0% 0%;
+    --cobalt: 216 100% 28%; /* Cobalt #00388F */
+    --cobalt-foreground: 0 0% 100%;
+    --lime: 77 100% 43%; /* Lime #91DC00 */
+    --lime-foreground: 0 0% 0%;
+    --att-blue: 197 100% 43%; /* AT&T Blue #009FDB */
+    --att-blue-foreground: 0 0% 100%;
+    --light-blue: 193 100% 50%; /* Light Blue #00C9FF */
+    --light-blue-foreground: 0 0% 0%;
+
+    /* Gradients using AT&T colors */
+    --gradient-primary: linear-gradient(135deg, hsl(197 100% 43%) 0%, hsl(193 100% 50%) 100%);
+    --gradient-accent: linear-gradient(135deg, hsl(216 100% 28%) 0%, hsl(197 100% 43%) 100%);
+    --gradient-card: linear-gradient(180deg, hsl(0 0% 100%) 0%, hsl(220 14% 96%) 100%);
+
+    /* Shadows */
+    --shadow-sm: 0 1px 2px 0 hsl(0 0% 0% / 0.05);
+    --shadow-md: 0 4px 6px -1px hsl(0 0% 0% / 0.1), 0 2px 4px -2px hsl(0 0% 0% / 0.08);
+    --shadow-lg: 0 10px 15px -3px hsl(0 0% 0% / 0.12), 0 4px 6px -4px hsl(0 0% 0% / 0.08);
+    --shadow-card: 0 1px 3px 0 hsl(0 0% 0% / 0.08), 0 1px 2px -1px hsl(0 0% 0% / 0.06);
+
+    --sidebar-background: 0 0% 100%;
+    --sidebar-foreground: 0 0% 0%;
+    --sidebar-primary: 197 100% 43%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 220 14% 96%;
+    --sidebar-accent-foreground: 0 0% 0%;
+    --sidebar-border: 210 6% 76%;
+    --sidebar-ring: 197 100% 43%;
+  }
+
+  .dark {
+    --background: 216 50% 8%;
+    --foreground: 220 14% 96%;
+
+    --card: 216 50% 12%;
+    --card-foreground: 220 14% 96%;
+
+    --popover: 216 50% 12%;
+    --popover-foreground: 220 14% 96%;
+
+    --primary: 197 100% 50%; /* Brighter AT&T Blue for dark mode */
+    --primary-foreground: 0 0% 0%;
+
+    --secondary: 216 80% 45%; /* Lighter Cobalt */
+    --secondary-foreground: 0 0% 100%;
+
+    --muted: 216 40% 18%;
+    --muted-foreground: 210 10% 70%;
+
+    --accent: 193 100% 55%; /* Brighter Light Blue */
+    --accent-foreground: 0 0% 0%;
+
+    --destructive: 0 62% 55%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 216 40% 22%;
+    --input: 216 40% 22%;
+    --ring: 197 100% 50%;
+
+    --success: 77 100% 50%; /* Brighter Lime */
+    --success-foreground: 0 0% 0%;
+    --warning: 38 85% 55%;
+    --warning-foreground: 0 0% 0%;
+    --info: 193 100% 55%;
+    --info-foreground: 0 0% 0%;
+    --mint: 173 82% 65%;
+    --mint-foreground: 0 0% 0%;
+    --cobalt: 216 80% 55%;
+    --cobalt-foreground: 0 0% 100%;
+    --lime: 77 100% 50%;
+    --lime-foreground: 0 0% 0%;
+    --att-blue: 197 100% 50%;
+    --att-blue-foreground: 0 0% 0%;
+    --light-blue: 193 100% 55%;
+    --light-blue-foreground: 0 0% 0%;
+
+    --sidebar-background: 216 50% 10%;
+    --sidebar-foreground: 220 14% 96%;
+    --sidebar-primary: 197 100% 50%;
+    --sidebar-primary-foreground: 0 0% 0%;
+    --sidebar-accent: 216 40% 18%;
+    --sidebar-accent-foreground: 220 14% 96%;
+    --sidebar-border: 216 40% 22%;
+    --sidebar-ring: 197 100% 50%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-family: 'Inter', sans-serif;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+  }
+}
+
+@layer utilities {
+  .gradient-primary {
+    background: var(--gradient-primary);
+  }
+  
+  .gradient-accent {
+    background: var(--gradient-accent);
+  }
+
+  .shadow-card {
+    box-shadow: var(--shadow-card);
+  }
+
+  .shadow-card-hover {
+    box-shadow: var(--shadow-md);
+  }
+
+  .animate-fade-in {
+    animation: fadeIn 0.3s ease-out;
+  }
+
+  .animate-slide-up {
+    animation: slideUp 0.4s ease-out;
+  }
+
+  .animate-scale-in {
+    animation: scaleIn 0.2s ease-out;
+  }
+
+  /* Demo Mode Blur Utilities */
+  .demo-blur-light {
+    display: inline-block;
+    filter: blur(3px);
+    user-select: none;
+    pointer-events: none;
+  }
+
+  .demo-blur-medium {
+    display: inline-block;
+    filter: blur(4px);
+    user-select: none;
+    pointer-events: none;
+  }
+
+  .demo-blur-heavy {
+    display: inline-block;
+    filter: blur(6px);
+    user-select: none;
+    pointer-events: none;
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { 
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to { 
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
