@@ -1,13 +1,15 @@
 import { Link, useLocation, useSearchParams } from 'react-router-dom';
 import { cn } from '@/lib/utils';
-import { Home, Zap, Users, Shield, BookOpen, Target, Sparkles, Package, Calculator, Menu } from 'lucide-react';
+import { Home, Zap, Users, Shield, BookOpen, Target, Sparkles, Package, Calculator, Menu, LogOut } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface EngineNavigationProps {
   activeTab?: string;
@@ -29,6 +31,12 @@ const navItems = [
 export function EngineNavigation({ activeTab, onTabChange }: EngineNavigationProps) {
   const location = useLocation();
   const [searchParams] = useSearchParams();
+  const { user, signOut } = useAuth();
+
+  const userEmail = user?.email ?? '';
+  const truncatedEmail = userEmail.length > 24
+    ? userEmail.slice(0, 21) + '...'
+    : userEmail;
   
   // Determine active tab from props, URL, or default to 'home'
   const currentTab = activeTab || 
@@ -47,7 +55,7 @@ export function EngineNavigation({ activeTab, onTabChange }: EngineNavigationPro
   const ActiveIcon = activeItem?.icon || Home;
 
   return (
-    <nav className="flex items-center justify-center">
+    <nav className="flex items-center justify-between w-full gap-2">
       {/* Mobile: Dropdown menu */}
       <div className="md:hidden">
         <DropdownMenu>
@@ -62,7 +70,7 @@ export function EngineNavigation({ activeTab, onTabChange }: EngineNavigationPro
             {navItems.map((item) => {
               const isActive = currentTab === item.id;
               const Icon = item.icon;
-              
+
               return (
                 <DropdownMenuItem key={item.id} asChild>
                   <Link
@@ -79,6 +87,14 @@ export function EngineNavigation({ activeTab, onTabChange }: EngineNavigationPro
                 </DropdownMenuItem>
               );
             })}
+            <DropdownMenuSeparator />
+            <DropdownMenuItem
+              onClick={signOut}
+              className="flex items-center gap-2 w-full cursor-pointer text-muted-foreground"
+            >
+              <LogOut className="w-4 h-4" />
+              <span>Sign Out</span>
+            </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
@@ -133,6 +149,24 @@ export function EngineNavigation({ activeTab, onTabChange }: EngineNavigationPro
             </Link>
           );
         })}
+      </div>
+
+      {/* Sign-out — hidden on mobile (in dropdown instead) */}
+      <div className="hidden md:flex items-center gap-2 ml-auto shrink-0">
+        {truncatedEmail && (
+          <span className="text-xs text-muted-foreground hidden lg:inline">
+            {truncatedEmail}
+          </span>
+        )}
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={signOut}
+          className="text-muted-foreground hover:text-foreground gap-1.5"
+        >
+          <LogOut className="w-3.5 h-3.5" />
+          <span className="hidden lg:inline text-xs">Sign Out</span>
+        </Button>
       </div>
     </nav>
   );

@@ -7,6 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Loader2, Search, AlertTriangle, CheckCircle, MessageSquare, HelpCircle, Copy, Check, Shield, History, Save, ChevronDown, ChevronUp, Trash2, Sparkles, Lightbulb } from 'lucide-react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 
@@ -193,6 +194,7 @@ const getCategoryLabel = (value: string | null) => {
 };
 
 export const CompetitorClaimsPage: React.FC = () => {
+  const { user } = useAuth();
   const [claim, setClaim] = useState('');
   const [competitor, setCompetitor] = useState('any');
   const [productCategory, setProductCategory] = useState('any');
@@ -322,6 +324,7 @@ export const CompetitorClaimsPage: React.FC = () => {
         att_advantage: response.attAdvantage || null,
         suggested_response: response.suggestedResponse || null,
         questions_to_ask: response.questionsToAsk || null,
+        user_id: user?.id ?? null,
       });
 
       if (error) throw error;
