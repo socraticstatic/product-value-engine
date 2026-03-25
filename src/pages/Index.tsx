@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, useNavigate } from 'react-router-dom';
 import { CustomerProfile } from '@/types/customer';
 import { products, getProductById } from '@/data/products';
 import { CustomerProfileForm } from '@/components/CustomerProfileForm';
@@ -38,6 +38,7 @@ const getSegmentLabel = (type: string) => {
 
 const Index = () => {
   const [searchParams, setSearchParams] = useSearchParams();
+  const navigate = useNavigate();
   const [step, setStep] = useState<Step>('profile');
   const [customerProfile, setCustomerProfile] = useState<CustomerProfile | null>(null);
   const [selectedProducts, setSelectedProducts] = useState<string[]>([]);
@@ -190,7 +191,7 @@ const Index = () => {
 
                 {/* Product Value Lab */}
                 <div className="group p-6 rounded-xl bg-card shadow-[0_2px_8px_-2px_rgba(0,0,0,0.08),0_4px_16px_-4px_rgba(0,0,0,0.06)] hover:shadow-lg transition-all cursor-pointer border-2 border-purple-500/20"
-                     onClick={() => window.location.href = '/product-lab'}>
+                     onClick={() => navigate('/product-lab')}>
                   <div className="p-3 rounded-lg bg-purple-500/10 w-fit mb-4 group-hover:bg-purple-500/20 transition-colors">
                     <Sparkles className="w-6 h-6 text-purple-500" />
                   </div>

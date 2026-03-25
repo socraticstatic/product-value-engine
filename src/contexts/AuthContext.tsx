@@ -33,7 +33,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setLoading(false);
 
         // Clean up hash fragment left by magic link redirect (#access_token=...)
-        if (event === 'SIGNED_IN' && window.location.hash) {
+        // Only strip if it contains access_token, not HashRouter routes like #/product-lab
+        if (event === 'SIGNED_IN' && window.location.hash.includes('access_token')) {
           window.history.replaceState(null, '', window.location.pathname + window.location.search);
         }
       }
