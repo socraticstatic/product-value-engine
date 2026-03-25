@@ -27,8 +27,8 @@ const App = () => (
             <Suspense fallback={<div className="flex items-center justify-center min-h-screen"><Loader2 className="h-8 w-8 animate-spin text-muted-foreground" /></div>}>
               <Routes>
                 <Route path="/login" element={<Login />} />
-                <Route path="/" element={<ProtectedRoute><Index /></ProtectedRoute>} />
-                <Route path="/product-lab" element={<ProtectedRoute><ProductLab /></ProtectedRoute>} />
+                <Route path="/" element={<Index />} />
+                <Route path="/product-lab" element={<ProductLab />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </Suspense>

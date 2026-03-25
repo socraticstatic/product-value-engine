@@ -4,13 +4,14 @@
     {
       "name": "pve-dev",
       "runtimeExecutable": "npx",
-      "runtimeArgs": ["vite", "--host"],
-      "port": 8080,
-      "cwd": "/Users/micahbos/Desktop/product-value-engine",
-      "env": {
-        "VITE_SUPABASE_URL": "https://edwvaknvyvjigeozhqzl.supabase.co",
-        "VITE_SUPABASE_PUBLISHABLE_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVkd3Zha252eXZqaWdlb3pocXpsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk3ODUyNDYsImV4cCI6MjA4NTM2MTI0Nn0.7fe7HCg85rc01E3eFXcOg-wsOfHh3D1Xxq2c44vF28w"
-      }
+      "runtimeArgs": ["vite", "--host", "--port", "8080"],
+      "port": 8080
+    },
+    {
+      "name": "pve-preview",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["vite", "preview", "--host", "--port", "4173"],
+      "port": 4173
     }
   ]
 }
