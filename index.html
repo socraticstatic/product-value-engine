@@ -52,7 +52,8 @@
         if (redirect) {
           params.delete('p');
           var remaining = params.toString();
-          var newUrl = redirect + (remaining ? '?' + remaining : '');
+          // Prepend basename so React Router can match
+          var newUrl = '/product-value-engine' + redirect + (remaining ? '?' + remaining : '');
           window.history.replaceState(null, '', newUrl);
         }
       })();
