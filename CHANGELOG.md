@@ -4,6 +4,18 @@ All notable changes to the Product Value Engine project will be documented in th
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [0.5.1] - 2026-03-24
+
+### Fixed
+
+- Re-enabled requireAuthUser() in all 7 edge functions with verify_jwt=false (ES256 JWT format incompatible with Supabase built-in verifier on new projects)
+- Hash fragment cleanup after magic link redirect — AuthContext now calls replaceState to remove #access_token fragments on SIGNED_IN event, fixing tab navigation after login
+
+### Added
+
+- Maze usability testing snippet installed in index.html (async, <1KB loader)
+- Connected to Micah's team Maze workspace (socraticstatic.github.io domain)
+
 ## [0.5.0] - 2026-03-24
 
 ### Security

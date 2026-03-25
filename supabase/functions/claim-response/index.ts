@@ -2,7 +2,7 @@ import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { z } from "https://deno.land/x/zod@v3.22.4/mod.ts";
 import { getCorsHeaders, handleCors, sanitizeForPrompt, requireApiKey, handleAiGatewayError, errorResponse } from "../_shared/security.ts";
-// import { requireAuthUser } from "../_shared/auth.ts";
+import { requireAuthUser } from "../_shared/auth.ts";
 
 // Input validation schema
 const claimRequestSchema = z.object({
@@ -19,8 +19,8 @@ serve(async (req) => {
     const corsHeaders = getCorsHeaders(req);
 
     // Verify authenticated @att.com user
-    // const authResult = await requireAuthUser(req, corsHeaders);
-    // if (authResult.error) return authResult.error;
+    const authResult = await requireAuthUser(req, corsHeaders);
+    if (authResult.error) return authResult.error;
 
     // Parse and validate input
     const rawBody = await req.json();
