@@ -43,6 +43,20 @@
   </head>
 
   <body>
+    <script>
+      // GitHub Pages SPA routing: restore path from ?p= query param
+      // This runs before React mounts so the router sees the correct URL
+      (function() {
+        var params = new URLSearchParams(window.location.search);
+        var redirect = params.get('p');
+        if (redirect) {
+          params.delete('p');
+          var remaining = params.toString();
+          var newUrl = redirect + (remaining ? '?' + remaining : '');
+          window.history.replaceState(null, '', newUrl);
+        }
+      })();
+    </script>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
