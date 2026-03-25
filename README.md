@@ -55,10 +55,31 @@ Browser (SPA)
 - CORS origin allowlist on all edge functions (no wildcard)
 - LLM prompt input sanitization before interpolation
 - Row-Level Security with user ownership enforcement
-- JWT verification (verify_jwt=true) on all edge functions
-- Server-side @att.com domain validation in _shared/auth.ts
+- Custom auth gate (requireAuthUser) on all edge functions with JWT verification + @att.com domain check
+- Generic error responses to client (no internal message leakage)
 - Secrets managed via GitHub Secrets (build-time) and Supabase Edge Function Secrets (runtime)
 - No business data logged to console in production
+
+## Design System
+
+Aligned to the AT&T NetBond SDCI Design Library (Figma-verified):
+
+- **Font:** ATT Aleck Sans (400/500/700) -- 62KB WOFF2
+- **Primary:** Cobalt #0057b8
+- **Letter-spacing:** -0.03em globally
+- **Buttons:** Pill shape (rounded-full), 3 sizes (28/36/44px)
+- **Cards:** 16px radius, subtle border
+- **Type scale:** figma-xs (10px) through figma-5xl (56px)
+- **Accessibility:** prefers-reduced-motion support
+
+## Usability Testing
+
+Maze usability testing is integrated:
+
+- **Snippet:** Installed in index.html (async, <1KB)
+- **Live study:** [PVE Usability Test v1](https://t.maze.co/515187571)
+- **Features:** Heatmaps, screen recording, website task testing, open questions
+- **Dashboard:** [Maze Results](https://app.maze.co/projects/515163141/mazes/515187571/results)
 
 ## Getting Started
 
@@ -106,10 +127,12 @@ Push to `main` triggers the GitHub Actions workflow, which builds and deploys to
 ### Edge Functions
 
 ```bash
-supabase functions deploy
+supabase functions deploy --no-verify-jwt
 ```
 
 Edge function secrets (GOOGLE_AI_API_KEY) are managed through the Supabase dashboard or CLI.
+
+Note: `--no-verify-jwt` is required because the new Supabase project uses ES256 JWTs which are incompatible with the built-in verifier. Auth is enforced by `requireAuthUser()` in each function instead.
 
 ## Project Structure
 

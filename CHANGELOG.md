@@ -4,17 +4,30 @@ All notable changes to the Product Value Engine project will be documented in th
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
-## [0.5.1] - 2026-03-24
+## [0.6.0] - 2026-03-24
+
+### Added
+
+- Maze usability testing: "PVE Usability Test v1" study created and live
+  - Study link: https://t.maze.co/515187571
+  - 7 blocks: welcome, screener, role question, 2 open questions, website test (PVE live site), thank you
+  - Website test linked to socraticstatic.github.io/product-value-engine with heatmaps enabled
+  - Snippet verified, screen recording available
+- Full UX click-through test suite completed (12 tests, all passing)
+  - Login validation, auth redirect, magic link authentication
+  - All 9 feature tabs render correctly
+  - Claim Analysis AI end-to-end with Google Gemini (auth enforced)
+  - Sign out + session cleanup verified
 
 ### Fixed
 
 - Re-enabled requireAuthUser() in all 7 edge functions with verify_jwt=false (ES256 JWT format incompatible with Supabase built-in verifier on new projects)
-- Hash fragment cleanup after magic link redirect — AuthContext now calls replaceState to remove #access_token fragments on SIGNED_IN event, fixing tab navigation after login
+- Hash fragment cleanup after magic link redirect -- AuthContext now calls replaceState to remove #access_token fragments on SIGNED_IN event, fixing tab navigation after login
 
-### Added
+### Security
 
-- Maze usability testing snippet installed in index.html (async, <1KB loader)
-- Connected to Micah's team Maze workspace (socraticstatic.github.io domain)
+- @att.com domain restriction verified end-to-end: no-auth returns 401, authenticated @att.com user succeeds
+- Edge functions deployed with auth re-enabled after testing
 
 ## [0.5.0] - 2026-03-24
 
