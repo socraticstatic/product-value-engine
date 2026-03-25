@@ -2,25 +2,10 @@
 <html>
   <head>
     <meta charset="utf-8">
-    <title>Product Value Engine</title>
-    <script>
-      // GitHub Pages SPA redirect
-      // Converts /product-value-engine/product-lab into
-      // /product-value-engine/?p=/product-lab
-      // The main index.html then restores the real URL via replaceState
-      var base = '/product-value-engine';
-      var path = window.location.pathname;
-      // Strip the base prefix
-      var route = path.replace(base, '') || '/';
-      var search = window.location.search;
-      var hash = window.location.hash;
-      // Redirect to root with route encoded as query param
-      window.location.replace(
-        base + '/?p=' + encodeURIComponent(route + search + hash)
-      );
-    </script>
+    <meta http-equiv="refresh" content="0;url=/product-value-engine/">
+    <title>Redirecting...</title>
   </head>
   <body>
-    Redirecting&hellip;
+    Redirecting to <a href="/product-value-engine/">Product Value Engine</a>...
   </body>
 </html>
