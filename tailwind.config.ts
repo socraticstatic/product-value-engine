@@ -15,6 +15,7 @@ export default {
     extend: {
       fontFamily: {
         sans: ['ATT Aleck Sans', 'Inter', 'system-ui', 'sans-serif'],
+        display: ['ATT Aleck Sans', 'Inter', 'system-ui', 'sans-serif'],
       },
       fontSize: {
         /* SDCI Figma type scale */

@@ -15,7 +15,7 @@ export const ValuePropFlyer = forwardRef<HTMLDivElement, ValuePropFlyerProps>(
     return (
       <div
         ref={ref}
-        style={{ width: 1080, height: 1536, fontFamily: "'Plus Jakarta Sans', 'Inter', sans-serif" }}
+        style={{ width: 1080, height: 1536, fontFamily: "'ATT Aleck Sans', 'Inter', system-ui, sans-serif" }}
         className="relative bg-white overflow-hidden"
       >
         {/* Background */}
