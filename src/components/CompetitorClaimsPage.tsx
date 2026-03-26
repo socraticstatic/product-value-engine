@@ -621,7 +621,7 @@ export const CompetitorClaimsPage: React.FC = () => {
                 </div>
               </CardHeader>
               <CardContent>
-                <p className="text-foreground italic">"{response.suggestedResponse}"</p>
+                <div className="text-foreground italic prose prose-sm max-w-none" dangerouslySetInnerHTML={{ __html: response.suggestedResponse }} />
               </CardContent>
             </Card>
           )}
@@ -744,7 +744,7 @@ export const CompetitorClaimsPage: React.FC = () => {
                 </div>
               </CardHeader>
               <CardContent>
-                <p className="text-muted-foreground">{response.claimAnalysis}</p>
+                <div className="text-muted-foreground prose prose-sm max-w-none" dangerouslySetInnerHTML={{ __html: response.claimAnalysis }} />
               </CardContent>
             </Card>
           )}
@@ -763,14 +763,7 @@ export const CompetitorClaimsPage: React.FC = () => {
                   {response.notApplesToApples.map((point, index) => (
                     <li key={index} className="flex items-start gap-2">
                       <span className="text-amber-500 mt-1">•</span>
-                      <span className="text-muted-foreground">
-                        {point.split(/(\*\*[^*]+\*\*)/).map((part, i) => {
-                          if (part.startsWith('**') && part.endsWith('**')) {
-                            return <strong key={i} className="font-semibold text-foreground">{part.slice(2, -2)}</strong>;
-                          }
-                          return part;
-                        })}
-                      </span>
+                      <span className="text-muted-foreground" dangerouslySetInnerHTML={{ __html: point }} />
                     </li>
                   ))}
                 </ul>
@@ -791,7 +784,7 @@ export const CompetitorClaimsPage: React.FC = () => {
                 </div>
               </CardHeader>
               <CardContent>
-                <p className="text-muted-foreground">{response.attAdvantage}</p>
+                <div className="text-muted-foreground prose prose-sm max-w-none" dangerouslySetInnerHTML={{ __html: response.attAdvantage }} />
               </CardContent>
             </Card>
           )}
