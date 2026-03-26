@@ -31,6 +31,7 @@ import {
   type CustomerPersona,
   type GroupingKey
 } from '@/data/personas';
+import { IndustryTrendsPanel } from '@/components/product-lab/IndustryTrendsPanel';
 import { RolePlayChat } from './RolePlayChat';
 import { PersonaBuyingCard } from './PersonaBuyingCard';
 import { QuickMatchTool } from './QuickMatchTool';
@@ -145,7 +146,7 @@ export function PersonasWidget() {
                 className="gap-2"
               >
                 <Play className="w-4 h-4" />
-                Practice Pitch
+                Explore Persona
               </Button>
               <Button 
                 type="button"
@@ -178,11 +179,12 @@ export function PersonasWidget() {
           </div>
 
           <Tabs defaultValue="profile" className="w-full">
-            <TabsList className="grid w-full grid-cols-5 mb-4">
+            <TabsList className="grid w-full grid-cols-6 mb-4">
               <TabsTrigger value="profile">Profile</TabsTrigger>
               <TabsTrigger value="needs">Needs</TabsTrigger>
-              <TabsTrigger value="approach">Approach</TabsTrigger>
+              <TabsTrigger value="approach">Strategy</TabsTrigger>
               <TabsTrigger value="objections">Objections</TabsTrigger>
+              <TabsTrigger value="trends">Trends</TabsTrigger>
               <TabsTrigger value="groupings">Groupings</TabsTrigger>
             </TabsList>
             
@@ -307,7 +309,7 @@ export function PersonasWidget() {
                 <div className="bg-primary/5 rounded-lg p-4 border border-primary/20">
                   <h4 className="font-semibold text-foreground mb-2 flex items-center gap-2">
                     <Briefcase className="w-4 h-4 text-primary" />
-                    Sales Approach
+                    Engagement Strategy
                   </h4>
                   <p className="text-sm text-muted-foreground">{selectedPersona.salesApproach}</p>
                 </div>
@@ -389,7 +391,11 @@ export function PersonasWidget() {
                 })}
               </div>
             </TabsContent>
-            
+
+            <TabsContent value="trends">
+              <IndustryTrendsPanel persona={selectedPersona ?? undefined} />
+            </TabsContent>
+
             <TabsContent value="groupings">
               <div className="space-y-4">
                 <p className="text-sm text-muted-foreground">

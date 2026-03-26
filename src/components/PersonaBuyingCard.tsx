@@ -20,6 +20,7 @@ import type { CustomerPersona } from '@/data/personas';
 import type { Product } from '@/data/products';
 import type { CustomerUseCase } from '@/data/messagingPillars';
 import { getExpectedOutcomes } from '@/utils/personaProductMapping';
+import { getTopTrends } from '@/data/industryTechTrends';
 
 interface PersonaBuyingCardProps {
   persona: CustomerPersona;
@@ -128,6 +129,29 @@ export function PersonaBuyingCard({
             </div>
           </div>
 
+          {/* Industry Trends */}
+          {(() => {
+            const trends = getTopTrends(persona.industry, 2);
+            return trends.length > 0 ? (
+              <div>
+                <div className="flex items-center gap-1.5 mb-2">
+                  <TrendingUp className="w-3 h-3 text-warning" />
+                  <span className="font-medium text-xs text-muted-foreground uppercase tracking-wide">Industry Trends</span>
+                </div>
+                <div className="space-y-1">
+                  {trends.map((trend, i) => (
+                    <div key={i} className="flex items-start gap-1.5 text-xs">
+                      <div className={`w-1.5 h-1.5 rounded-full mt-1.5 shrink-0 ${
+                        trend.impact === 'high' ? 'bg-destructive' : 'bg-primary'
+                      }`} />
+                      <span className="text-muted-foreground leading-snug">{trend.trend}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ) : null;
+          })()}
+
           {/* Products */}
           <div>
             <div className="flex items-center gap-1.5 mb-2">
@@ -225,7 +249,7 @@ export function PersonaBuyingCard({
           onClick={() => onPracticePitch(persona)}
           className="flex-1 text-emerald-500 border-emerald-500/30 hover:bg-emerald-500/10 text-xs h-8"
         >
-          <Play className="w-3 h-3 mr-1" /> Practice
+          <Play className="w-3 h-3 mr-1" /> Explore Persona
         </Button>
         <Button 
           type="button"

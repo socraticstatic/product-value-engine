@@ -2,7 +2,8 @@ import { CustomerPersona } from '@/data/personas';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Target, AlertTriangle, Lightbulb, Building2, Users, DollarSign } from 'lucide-react';
+import { Target, AlertTriangle, Lightbulb, Building2, Users, DollarSign, TrendingUp } from 'lucide-react';
+import { getTopTrends } from '@/data/industryTechTrends';
 
 interface PersonaProfileSnapshotProps {
   persona: CustomerPersona | undefined;
@@ -154,6 +155,29 @@ export function PersonaProfileSnapshot({ persona }: PersonaProfileSnapshotProps)
               </blockquote>
             </div>
           )}
+
+          {/* Industry Trends */}
+          {(() => {
+            const trends = getTopTrends(persona.industry, 3);
+            return trends.length > 0 ? (
+              <div className="space-y-2">
+                <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
+                  <TrendingUp className="w-4 h-4" />
+                  Industry Trends
+                </div>
+                <div className="space-y-1.5">
+                  {trends.map((trend, i) => (
+                    <div key={i} className="flex items-start gap-2 text-sm">
+                      <div className={`w-1.5 h-1.5 rounded-full mt-2 shrink-0 ${
+                        trend.impact === 'high' ? 'bg-destructive' : 'bg-primary'
+                      }`} />
+                      <span className="text-xs leading-snug">{trend.trend}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ) : null;
+          })()}
 
           {/* Buying Behavior */}
           {persona.buyingBehavior && (

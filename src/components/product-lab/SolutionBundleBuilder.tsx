@@ -9,6 +9,7 @@ import { BundleSummaryCard } from './BundleSummaryCard';
 import { SegmentFitGrid } from './SegmentFitGrid';
 import { BundleCompetitiveAnalysis } from './BundleCompetitiveAnalysis';
 import { MultiProductValuePropDisplay } from './MultiProductValuePropDisplay';
+import { CustomerJourneyPanel } from './CustomerJourneyPanel';
 import { Sparkles, RotateCcw, ChevronDown, BarChart3, FileText } from 'lucide-react';
 
 interface SolutionBundleBuilderProps {
@@ -130,6 +131,11 @@ export function SolutionBundleBuilder({ selectedProducts, onProductsChange }: So
       {/* Competitive Position */}
       {selectedProducts.length > 0 && (
         <BundleCompetitiveAnalysis productIds={selectedProducts} />
+      )}
+
+      {/* CX Journey Requirements */}
+      {selectedProducts.length > 0 && (
+        <CustomerJourneyPanel productIds={selectedProducts} />
       )}
 
       {/* Segment Fit Analysis - Collapsible */}

@@ -3,6 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { PersonaFeedbackChat } from './PersonaFeedbackChat';
 import { PersonaProfileSnapshot } from './PersonaProfileSnapshot';
+import { IndustryTrendsPanel } from './IndustryTrendsPanel';
 import { ProductSelector } from './ProductSelector';
 import { customerPersonas } from '@/data/personas';
 
@@ -138,8 +139,9 @@ export function FeedbackStudioTab({
 
       {/* Right Column: Persona Profile Snapshot */}
       <div className="lg:col-span-1">
-        <div className="sticky top-4">
+        <div className="sticky top-4 space-y-4">
           <PersonaProfileSnapshot persona={selectedPersona} />
+          <IndustryTrendsPanel persona={selectedPersona} />
         </div>
       </div>
       </div>

@@ -14,9 +14,11 @@ import {
   Lightbulb,
   Target,
   AlertTriangle,
-  RotateCcw
+  RotateCcw,
+  Building2
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
+import { IndustryTrendsPanel } from '@/components/product-lab/IndustryTrendsPanel';
 import type { CustomerPersona } from '@/data/personas';
 
 interface Message {
@@ -271,7 +273,7 @@ export function RolePlayChat({ persona, onClose }: RolePlayChatProps) {
               <div className="text-3xl">{persona.avatar}</div>
               <div>
                 <CardTitle className="text-lg text-foreground flex items-center gap-2">
-                  Role-Play: {persona.name}
+                  Customer Discovery: {persona.name}
                   <Badge variant="outline" className="text-xs bg-primary/10 text-primary border-primary/30">
                     Segment {persona.segmentId}
                   </Badge>
@@ -350,7 +352,7 @@ export function RolePlayChat({ persona, onClose }: RolePlayChatProps) {
                   ref={inputRef}
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
-                  placeholder="Type your sales pitch..."
+                  placeholder="Ask about their needs, challenges, or workflows..."
                   disabled={isLoading}
                   className="flex-1"
                 />
@@ -374,42 +376,64 @@ export function RolePlayChat({ persona, onClose }: RolePlayChatProps) {
             </div>
           </div>
 
-          {/* Tips sidebar */}
-          <div className="w-64 border-l border-border p-4 bg-muted/30 shrink-0 overflow-y-auto">
+          {/* Customer Insights sidebar */}
+          <div className="w-72 border-l border-border p-4 bg-muted/30 shrink-0 overflow-y-auto">
             <h4 className="font-semibold text-foreground flex items-center gap-2 mb-3">
               <Lightbulb className="w-4 h-4 text-amber-500" />
-              Sales Tips
+              Customer Insights
             </h4>
-            
+
             <div className="space-y-4 text-xs">
+              {/* Top Needs with importance % */}
               <div>
                 <div className="flex items-center gap-1 text-emerald-400 font-medium mb-1">
                   <Target className="w-3 h-3" /> Top Needs
                 </div>
                 <ul className="space-y-1 text-muted-foreground">
-                  {persona.topNeeds.slice(0, 3).map((need, idx) => (
-                    <li key={idx}>• {need.need}</li>
+                  {persona.topNeeds.slice(0, 4).map((need, idx) => (
+                    <li key={idx} className="flex justify-between">
+                      <span>• {need.need}</span>
+                      <span className="text-muted-foreground/60">{need.importance}%</span>
+                    </li>
                   ))}
                 </ul>
               </div>
-              
+
+              {/* Pain Points */}
               <div>
                 <div className="flex items-center gap-1 text-amber-400 font-medium mb-1">
                   <AlertTriangle className="w-3 h-3" /> Pain Points
                 </div>
                 <ul className="space-y-1 text-muted-foreground">
-                  {persona.painPoints.slice(0, 3).map((point, idx) => (
+                  {persona.painPoints.slice(0, 4).map((point, idx) => (
                     <li key={idx}>• {point}</li>
                   ))}
                 </ul>
               </div>
 
+              {/* Segment Profile */}
               <div>
-                <div className="flex items-center gap-1 text-blue-400 font-medium mb-1">
-                  <MessageSquare className="w-3 h-3" /> Lead With
+                <div className="flex items-center gap-1 text-info font-medium mb-1">
+                  <Building2 className="w-3 h-3" /> Segment Profile
+                </div>
+                <div className="space-y-1 text-muted-foreground">
+                  <div className="flex justify-between"><span>Industry</span><span className="text-foreground">{persona.industry}</span></div>
+                  <div className="flex justify-between"><span>Employees</span><span className="text-foreground">{persona.employeeCount}</span></div>
+                  <div className="flex justify-between"><span>Tech Level</span><span className="text-foreground">{persona.techSophistication}</span></div>
+                  {persona.locations && <div className="flex justify-between"><span>Locations</span><span className="text-foreground">{persona.locations}</span></div>}
+                </div>
+              </div>
+
+              {/* Industry Trends compact */}
+              <IndustryTrendsPanel persona={persona} compact />
+
+              {/* Key Products */}
+              <div>
+                <div className="flex items-center gap-1 text-primary font-medium mb-1">
+                  <MessageSquare className="w-3 h-3" /> Key Products
                 </div>
                 <div className="flex flex-wrap gap-1">
-                  {persona.leadProducts.slice(0, 3).map((prod, idx) => (
+                  {persona.leadProducts.slice(0, 4).map((prod, idx) => (
                     <Badge key={idx} variant="outline" className="text-[10px]">
                       {prod}
                     </Badge>
@@ -427,10 +451,10 @@ export function RolePlayChat({ persona, onClose }: RolePlayChatProps) {
           <CardHeader className="pb-3">
             <CardTitle className="text-base flex items-center gap-2">
               <Bot className="w-5 h-5 text-primary" />
-              Session Feedback
+              Session Analysis
             </CardTitle>
             <p className="text-sm text-muted-foreground">
-              AI analysis of what you did well and areas to improve
+              Customer insights uncovered and areas to explore further
             </p>
           </CardHeader>
           <CardContent>
