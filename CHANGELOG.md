@@ -4,6 +4,39 @@ All notable changes to the Product Value Engine project will be documented in th
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [0.7.0] - 2026-03-26
+
+### Added
+
+- Customer Experience Journey Panel (LBGUPS): 6-stage CX lifecycle view (Learn/Buy/Get/Use/Pay/Support) with per-product requirements, priority badges, ownership labels, and multi-product CX insights. Integrated in Multi-Product Strategy tab.
+- Industry Trends Panel: 11 industries (healthcare, retail, finance, manufacturing, professional-services, hospitality, construction, transportation, education, government, real-estate) with industry trends, emerging tech, and competitive shifts. Integrated in:
+  - Feedback Studio right column
+  - Personas Hub "Trends" tab (new 6th tab)
+  - PersonaBuyingCard expanded view
+  - PersonaProfileSnapshot inline section
+  - RolePlayChat sidebar (compact mode)
+- RolePlayChat sidebar enriched: wider (w-72), new Segment Profile section (industry, employees, tech level, locations), importance percentages on Top Needs, 4 items per section (up from 3), compact Industry Trends panel
+- New data files: industryTechTrends.ts (286 lines, 11 industries), customerJourneyRequirements.ts (267 lines, 4 product categories)
+
+### Changed
+
+- Terminology reframed from seller-tool to PM strategy-tool:
+  - "Sales Tips" -> "Customer Insights"
+  - "Practice" / "Practice Pitch" -> "Explore Persona"
+  - "Role-Play: {name}" -> "Customer Discovery: {name}"
+  - "Sales Approach" -> "Engagement Strategy"
+  - "Approach" tab -> "Strategy" tab
+  - "Lead With" -> "Key Products"
+  - "Type your sales pitch..." -> "Ask about their needs, challenges, or workflows..."
+  - "Session Feedback" -> "Session Analysis"
+- PersonasWidget detail tabs expanded from 5 to 6 columns (added Trends)
+
+### Fixed
+
+- Replaced non-existent text-chart-4/chart-2 CSS tokens with text-warning/text-info (SDCI-compliant)
+- Fixed useMemo dependency warning in IndustryTrendsPanel (persona?.industry -> persona)
+- Removed unused imports: Route (SolutionBundleBuilder), TrendingUp (RolePlayChat), useDemoMode (CustomerJourneyPanel)
+
 ## [0.6.0] - 2026-03-24
 
 ### Added
