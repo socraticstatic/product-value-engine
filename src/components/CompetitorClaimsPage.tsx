@@ -11,6 +11,14 @@ import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 
+/** Convert markdown bold/italic to HTML so dangerouslySetInnerHTML renders it */
+function mdToHtml(text: string): string {
+  return text
+    .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+    .replace(/\*([^*]+)\*/g, '<em>$1</em>')
+    .replace(/\n/g, '<br />');
+}
+
 interface ClaimResponse {
   claimAnalysis?: string;
   notApplesToApples?: string[];
@@ -621,7 +629,7 @@ export const CompetitorClaimsPage: React.FC = () => {
                 </div>
               </CardHeader>
               <CardContent>
-                <div className="text-foreground italic prose prose-sm max-w-none" dangerouslySetInnerHTML={{ __html: response.suggestedResponse }} />
+                <div className="text-foreground italic prose prose-sm max-w-none" dangerouslySetInnerHTML={{ __html: mdToHtml(response.suggestedResponse) }} />
               </CardContent>
             </Card>
           )}
@@ -744,7 +752,7 @@ export const CompetitorClaimsPage: React.FC = () => {
                 </div>
               </CardHeader>
               <CardContent>
-                <div className="text-muted-foreground prose prose-sm max-w-none" dangerouslySetInnerHTML={{ __html: response.claimAnalysis }} />
+                <div className="text-muted-foreground prose prose-sm max-w-none" dangerouslySetInnerHTML={{ __html: mdToHtml(response.claimAnalysis) }} />
               </CardContent>
             </Card>
           )}
@@ -763,7 +771,7 @@ export const CompetitorClaimsPage: React.FC = () => {
                   {response.notApplesToApples.map((point, index) => (
                     <li key={index} className="flex items-start gap-2">
                       <span className="text-amber-500 mt-1">•</span>
-                      <span className="text-muted-foreground" dangerouslySetInnerHTML={{ __html: point }} />
+                      <span className="text-muted-foreground" dangerouslySetInnerHTML={{ __html: mdToHtml(point) }} />
                     </li>
                   ))}
                 </ul>
@@ -784,7 +792,7 @@ export const CompetitorClaimsPage: React.FC = () => {
                 </div>
               </CardHeader>
               <CardContent>
-                <div className="text-muted-foreground prose prose-sm max-w-none" dangerouslySetInnerHTML={{ __html: response.attAdvantage }} />
+                <div className="text-muted-foreground prose prose-sm max-w-none" dangerouslySetInnerHTML={{ __html: mdToHtml(response.attAdvantage) }} />
               </CardContent>
             </Card>
           )}
